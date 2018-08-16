@@ -1,0 +1,36 @@
+html,body{
+    width: 100%;height: 100%;
+    margin: 0;padding: 0;
+}
+
+*{
+    box-sizing: border-box;
+}
+
+#app{
+    width: 100%;height: 100%;
+    position: relative;
+    background-color: aquamarine;
+}
+
+#app canvas{
+    width: 800px;height: 400px;
+    position: absolute;
+    left: 50%;top: 50%;
+    transform: translate(-50%,-50%);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3)
+}
+
+
+.processbar{
+    width: 100%;height: 2px;
+    position: absolute;
+    top: 0;
+    background: #fff;
+}
+
+.processline{
+    width: 100%;
+    height:100%;
+    background-color: #90aeff
+}
