@@ -12,7 +12,6 @@ export default function app(ctx, width, height) {
             alert(msg)
         },
         reportProgress: (bar => (status, num) => {
-            console.log(num)
             if (num)
                 bar.style.width = num * 100 + '%'
             if (status == 'complete')
@@ -21,6 +20,12 @@ export default function app(ctx, width, height) {
         render(image) {
 
             image.forEach((v, i) => { imageData.data[i] = v })
+
+            ctx.putImageData(imageData, 0, 0)
+        },
+        renderPart(image,position){
+
+            image.forEach((v, i) => { imageData.data[i+position] = v })
 
             ctx.putImageData(imageData, 0, 0)
         }

@@ -1,5 +1,12 @@
-import Vec3 from "./vec3"
-import Ray from "./ray"
+
+import Sphere from './utils/Sphere'
+import hitable from './utils/hitable.interface'
+import HitableList from "./utils/HitableList";
+import Camera from "./utils/Camera";
+import Vec3 from "./utils/Vec3"
+import Ray from "./utils/Ray"
+
+
 import progress from './progress'
 
 export default function (image: Uint8ClampedArray, width: number, height: number): {
@@ -12,8 +19,20 @@ export default function (image: Uint8ClampedArray, width: number, height: number
 
         for (let x = 0; x < width; x++) {
 
-            let index = y * width * 4 + x * 4,
-                [r, g, b, a] = sampling(x / width, y / height)
+            let index = y * width * 4 + x * 4
+            const n = 100
+
+            let [r, g, b, a] = new Array(n)
+                .fill(0)
+                .map(v => sampling((x + Math.random()) / width, (y + Math.random()) / height))
+                .reduce((res, v) => {
+                    res[0] += v[0]
+                    res[1] += v[1]
+                    res[2] += v[2]
+                    res[3] += v[3]
+                    return res
+                }, [0, 0, 0, 0])
+                .map(v => v / n)
 
             image[index] = r * 255
             image[index + 1] = g * 255
@@ -21,7 +40,7 @@ export default function (image: Uint8ClampedArray, width: number, height: number
             image[index + 3] = a * 255
         }
 
-        progress(y/height)
+        progress(y / height)
     }
 
     progress('complete')
@@ -47,49 +66,47 @@ function sampling(_x: number, _y: number) {
     const horizontal = new Vec3(4, 0, 0)
     const leftBottom = new Vec3(-2, -1, -1)
 
+    const ray = camera.getRay(x, y)
 
-    const ray = new Ray(origin, leftBottom.add(horizontal.mul(x)).add(vertical.mul(y)))
+    const { e0, e1, e2 } = color(ray,world)
 
-
-    const {e0,e1,e2} = color(ray)
-
-    let a = 1
-
-
-    return [e0,e1,e2, a]
+    return [e0, e1, e2, 1]
 
 }
 
 
-function hitSphere(center: Vec3, radius: number, ray: Ray) {
-    const oc = Vec3.sub(ray.origin, center)
-    const a = Vec3.dot(ray.direction, ray.direction)
-    const b = Vec3.dot(oc, ray.direction) * 2
-    const c = Vec3.dot(oc, oc) - radius ** 2
+const ball = new Sphere(new Vec3(0, 0, -1), 0.5)
+const earth = new Sphere(new Vec3(0, -100.5, -1), 100)
+const world = new HitableList([ball, earth])
 
-    const dist = b ** 2 - 4 * a * c
+const camera = new Camera(new Vec3(0, 0, 0), new Vec3(-2, -1, -1), new Vec3(4, 0, 0), new Vec3(0, 2, 0))
 
-    return (
-        dist < 0 ?
-            -1 :
-            (-b - Math.sqrt(dist)) / (2 * a)
-    )
+function randomInUnitSphere() {
+    let p: Vec3
+    do {
+        p = new Vec3(Math.random(), Math.random(), Math.random()).mul(2.0).sub(new Vec3(1, 1, 1))
+    } while (p.squaredLength() >= 1)
+
+    return p
 }
 
-function color(r: Ray) {
-    let t1 = hitSphere(new Vec3(0, 0, -1), 0.5, r)
 
-    // 画个球
-    if (t1 > 0) {
-        const n = Vec3.sub(r.getPoint(t1), new Vec3(0, 0, -1))
-        return n.add(1).mul(0.7)
+function color(r: Ray, world: hitable): Vec3 {
+    const hitRecord = world.hit(r, 0, Infinity)
+
+    if (hitRecord) {
+        const target = hitRecord.p.add(hitRecord.normal).add(randomInUnitSphere())
+        return color(new Ray(hitRecord.p, target.sub(hitRecord.p)),world).mul(0.5)
+        // return hitRecord.normal.add(1).mul(0.5)
     }
+
 
     // 设置背景色
     const
         unitDirection = r.direction.unitVec(),
         t = (unitDirection.e1 + 1.0) * 0.5
 
-    return Vec3.add(new Vec3(1, 1, 1).mul((1 - t)), new Vec3(0.5, 0.7, 1).mul(t))
+    return new Vec3(1,1,1)
+    // return Vec3.add(new Vec3(1, 1, 1).mul((1 - t)), new Vec3(0.5, 0.7, 1).mul(t))
 }
 
