@@ -3,7 +3,10 @@ var path = require('path')
 module.exports = {
     entry:{
         'entry':path.resolve(__dirname, './src/entry.ts'),
-        'task.worker':path.resolve(__dirname, './src/task.worker.ts')
+        'task.worker':path.resolve(__dirname, './src/task.worker.ts'),
+        
+        'app':path.resolve(__dirname, './src/app.ts'),
+        '_task.worker':path.resolve(__dirname, './src/_task.worker.ts')
     },
     output:{
         path: path.resolve(__dirname, './dist'),

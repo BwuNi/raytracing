@@ -23,9 +23,6 @@ onmessage = function (e) {
             ; (<any>postMessage)(msg)
         }
     } else {
-        ; (<any>postMessage)({
-            method: 'warning',
-            args: [`taskWorker: can't find method (${method})`]
-        })
+        console.log(`taskWorker: can't find method (${method})`)
     }
 }
