@@ -6,20 +6,20 @@ import Vec3 from './utils/Vec3'
 import Ray from './utils/Ray'
 import RenderTask from '../worker/RenderTask'
 
-import progress from './progress'
 
-export default function(
-    task: RenderTask
-): {
-    method: string
-    args: RenderTask[]
-} {
+export default function (
+    task: RenderTask,
+    send: (task: RenderTask) => void
+) {
 
-    const { pixels, position } = task
-    const n = 10
+    const { pixels, width, height, position } = task
+    const n = 1000
 
-    pixels.forEach(v => {
-        const { x, y, width, height } = v
+    let dataLen = 400
+    let data = new RenderTask(position, [], width, height)
+
+    pixels.forEach((v, i) => {
+        const { x, y } = v
 
         const [r, g, b, a] = new Array(n)
             .fill(0)
@@ -41,14 +41,22 @@ export default function(
             )
             .map(v => (v / n) * 255)
 
-        v.fill(r, g, b, a)
+        v.color = [r, g, b, a]
+
+
+        if (data.pixels.length >= dataLen) {
+            data.position
+            send(data)
+            data = new RenderTask(position + i*4, [], width, height)
+        }
+
+        data.pixels.push(v)
+
+        // v.color = [255, 255, 255, 255]
     })
 
 
-    return {
-        method: 'render',
-        args: [task]
-    }
+    if (data.pixels.length > 0) send(data)
 }
 
 // input   x [0..1] y [1..0]

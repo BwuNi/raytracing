@@ -3,20 +3,27 @@ import render from './renderTask/index'
 
 const appMsg: { [key: string]: Function } = {
     renderTask(task: RenderTask) {
-        ;(<any>postMessage)(render(task))
+
+        render(task, (task) => {
+            ; (<any>postMessage)({
+                method:'render',
+                args:[task]
+            })
+        })
+
     }
 }
 
-onmessage = function(e) {
+onmessage = function (e) {
     const { method, args = [] } = e.data
 
     if (appMsg[method]) {
         const msg = appMsg[method](...args)
         if (msg) {
-            ;(<any>postMessage)(msg)
+            ; (<any>postMessage)(msg)
         }
     } else {
-        ;(<any>postMessage)({
+        ; (<any>postMessage)({
             method: 'warning',
             args: [`taskWorker: can't find method (${method})`]
         })
