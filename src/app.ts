@@ -12,7 +12,7 @@ const ctx = canvas.getContext('2d')
 const image = ctx.createImageData(width, height)
 const bar = document.getElementById('processline')
 
-initTasks(ctx, height, width, 2)
+initTasks(ctx,width,height, 4)
 
 function initTasks(
     ctx: CanvasRenderingContext2D,
@@ -31,7 +31,10 @@ function initTasks(
 
             if (task.pixels.length >= len || y * width + x === n - 1) {
                 performTask(task)
-                task = new RenderTask(y * width * 4 + x * 4, [], width, height)
+                task = new RenderTask(
+					(y * width + x ) * 4 , 
+					[],
+					 width, height)
             }
         }
     }
@@ -59,7 +62,6 @@ const taskMsg: { [key: string]: Function } = {
 	},
 
     allComplete(worker: Worker, task: RenderTask) {
-
 		task.pixels.forEach((v,i)=>{
             const _i = i * 4
             image.data[_i + task.position] = v.r
@@ -80,7 +82,7 @@ const taskMsg: { [key: string]: Function } = {
 
 // 执行一个 task
 function performTask(task: RenderTask) {
-    const worker = new Worker('./dist/_task.worker.js')
+    const worker = new Worker('./dist/task.worker.js')
 
 	console.log(2)
     worker.postMessage({

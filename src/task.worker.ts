@@ -1,28 +1,48 @@
-import RenderTask from './worker/RenderTask'
-import render from './renderTask/index'
+import RenderTask from './task/RenderTask'
+import Px from './task/Px'
+import renderPixel from './render/index'
+
 
 const appMsg: { [key: string]: Function } = {
-    renderTask(task: RenderTask) {
-
-        render(task, (task) => {
-            ; (<any>postMessage)({
-                method:'render',
-                args:[task]
-            })
-        })
-
-    }
+    render
 }
 
-onmessage = function (e) {
+onmessage = function(e) {
     const { method, args = [] } = e.data
 
     if (appMsg[method]) {
-        const msg = appMsg[method](...args)
-        if (msg) {
-            ; (<any>postMessage)(msg)
-        }
+        appMsg[method](...args)
     } else {
         console.log(`taskWorker: can't find method (${method})`)
     }
 }
+
+function render(task: RenderTask) {
+
+    const { pixels, width, height, position } = task
+	const len = 400
+
+	let res = new RenderTask(position,[],width,height)
+
+    pixels.forEach((v, i) => {
+		renderPixel(v, width, height)
+		res.pixels.push(v)
+
+		if(res.pixels.length >= len){
+			
+			;(<any>postMessage)({
+				method:'partComplete',
+				args:[res]
+			})
+
+			res = new RenderTask(position + (i+1)*4,[],width,height)
+		}
+
+	})
+	
+	;(<any>postMessage)({
+		method:'allComplete',
+		args:[res]
+	})
+}
+
