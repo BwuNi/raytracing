@@ -3,7 +3,6 @@ import Material from "./material.interface";
 import Ray from "./ray";
 import HitRecord from "./HitRecord";
 
-
 function randomInUnitSphere() {
     let p: Vec3
     do {
@@ -16,20 +15,18 @@ function randomInUnitSphere() {
 }
 
 export default class Lambertian implements Material {
-    albedo: Vec3 = new Vec3(0, 0, 0)
+    albedo: Vec3 = new Vec3(0.5, 0.5, 0.5)
     constructor() {
 
     }
 
-    scatter(ray_in: Ray, hitRecord: HitRecord, attenuation: Vec3, scattered: Ray) {
+    scatter(ray_in: Ray, hitRecord: HitRecord) {
 
 
         const target = hitRecord.p
             .add(hitRecord.normal)
             .add(randomInUnitSphere())
 
-        scattered = new Ray(hitRecord.p, target.sub(hitRecord.p))
-        attenuation = this.albedo
-        return true
+        return new Ray(hitRecord.p, target.sub(hitRecord.p))
     }
 }

@@ -6,28 +6,30 @@ import HitableList from './utils/HitableList'
 import Camera from './utils/Camera'
 import Vec3 from './utils/Vec3'
 import Ray from './utils/Ray'
+import Lambertian from './utils/Lambertian'
+import Metal from './utils/Metal'
 
 export default function renderPixel(px: Px, width: number, height: number) {
-    const n = 50
-        ;[px.r, px.g, px.b, px.a] = new Array(n)
-            .fill(0)
-            .map(m =>
-                sampling(
-                    (px.x + Math.random()) / width,
-                    (px.y + Math.random()) / height
-                )
+    const n = 1000
+    ;[px.r, px.g, px.b, px.a] = new Array(n)
+        .fill(0)
+        .map(m =>
+            sampling(
+                (px.x + Math.random()) / width,
+                (px.y + Math.random()) / height
             )
-            .reduce(
-                (res, v) => {
-                    res[0] += v[0]
-                    res[1] += v[1]
-                    res[2] += v[2]
-                    res[3] += v[3]
-                    return res
-                },
-                [0, 0, 0, 0]
-            )
-            .map(v => ((v / n))**(3/4) * 255)
+        )
+        .reduce(
+            (res, v) => {
+                res[0] += v[0]
+                res[1] += v[1]
+                res[2] += v[2]
+                res[3] += v[3]
+                return res
+            },
+            [0, 0, 0, 0]
+        )
+        .map(v => (v / n) ** (3 / 4) * 255)
 }
 
 function sampling(_x: number, _y: number) {
@@ -50,13 +52,13 @@ const ball0 = new Sphere(new Vec3(0, 0, -1), 0.5)
 const ball1 = new Sphere(new Vec3(-1, 0, -1), 0.5)
 const ball2 = new Sphere(new Vec3(1, 0, -1), 0.5)
 const earth = new Sphere(new Vec3(0, -100.5, -1), 100)
-const world = new HitableList([ball0,ball1,ball2, earth])
+const world = new HitableList([ball0, ball1, ball2, earth])
 
 const camera = new Camera(
-    new Vec3(0, 0, 0),//origin
-    new Vec3(-2, -1, -1),//leftBottom
-    new Vec3(4, 0, 0),//horizontal
-    new Vec3(0, 2, 0)//vertical
+    new Vec3(0, 0, 0), //origin
+    new Vec3(-2, -1, -1), //leftBottom
+    new Vec3(4, 0, 0), //horizontal
+    new Vec3(0, 2, 0) //vertical
 )
 
 function randomInUnitSphere() {
@@ -70,15 +72,32 @@ function randomInUnitSphere() {
     return p
 }
 
-function color(r: Ray, world: hitable): Vec3 {
+const lambertian = new Metal()
+
+function color(
+    r: Ray,
+    world: hitable,
+    step: number = 0,
+    attenuation: number|Vec3 = 1
+): Vec3 {
+    if (step > 50) return new Vec3(0, 0, 0)
+
     let hitRecord = world.hit(r, 0.001, Infinity)
 
     // 递归实现
     if (hitRecord) {
-        const target = hitRecord.p
-            .add(hitRecord.normal)
-            .add(randomInUnitSphere())
-        return color(new Ray(hitRecord.p, target.sub(hitRecord.p)), world).mul(0.5)
+        const scattered = lambertian.scatter(r, hitRecord)
+
+        if (scattered) {
+            const target = hitRecord.p
+                .add(hitRecord.normal)
+                .add(randomInUnitSphere())
+
+            return color(scattered,world,50,lambertian.albedo.mul(attenuation))
+        }
+        // return color(new Ray(hitRecord.p, target.sub(hitRecord.p)), world).mul(
+        //     0.5
+        // )
         // return hitRecord.normal.add(1).mul(0.5)
     }
     // 设置背景色
@@ -86,7 +105,5 @@ function color(r: Ray, world: hitable): Vec3 {
         t = (unitDirection.e1 + 1.0) * 0.5
 
     // return new Vec3(1, 1, 1)
-    return Vec3.add(new Vec3(1, 1, 1).mul((1 - t)), new Vec3(0.5, 0.7, 1).mul(t))
-
-
+    return Vec3.add(new Vec3(1, 1, 1).mul(1 - t), new Vec3(0.5, 0.7, 1).mul(t)).mul(attenuation)
 }
