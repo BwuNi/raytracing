@@ -32,7 +32,7 @@ function initTasks(
             if (task.pixels.length >= len || y * width + x === n - 1) {
                 performTask(task)
                 task = new RenderTask(
-					(y * width + x ) * 4 , 
+					(y * width + x +1) * 4 , 
 					[],
 					 width, height)
             }
@@ -61,19 +61,23 @@ const taskMsg: { [key: string]: Function } = {
 		
 	},
 
-    allComplete(worker: Worker, task: RenderTask) {
-		task.pixels.forEach((v,i)=>{
-            const _i = i * 4
-            image.data[_i + task.position] = v.r
-            image.data[_i + task.position + 1] = v.g
-            image.data[_i + task.position + 2] = v.b
-            image.data[_i + task.position + 3] = v.a
-		})
+    allComplete(worker: Worker, task: RenderTask|null) {
 
-		complete += task.pixels.length
-		bar.style.width = (complete/amount*100) +'%'
-
-		ctx.putImageData(image, 0, 0)
+        if(task){
+            task.pixels.forEach((v,i)=>{
+                const _i = i * 4
+                image.data[_i + task.position] = v.r
+                image.data[_i + task.position + 1] = v.g
+                image.data[_i + task.position + 2] = v.b
+                image.data[_i + task.position + 3] = v.a
+            })
+    
+            complete += task.pixels.length
+            bar.style.width = (complete/amount*100) +'%'
+    
+            ctx.putImageData(image, 0, 0)
+            
+        }
 		
 		worker.terminate()
 
