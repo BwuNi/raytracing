@@ -1,6 +1,6 @@
 import Vec3 from "./Vec3";
 import Material from "./material.interface";
-import Ray from "./ray";
+import Ray from "./Ray";
 import HitRecord from "./HitRecord";
 
 function randomInUnitSphere() {
@@ -9,15 +9,17 @@ function randomInUnitSphere() {
         p = new Vec3(Math.random(), Math.random(), Math.random())
             .mul(2.0)
             .sub(new Vec3(1, 1, 1))
-    } while (p.squaredLength() >= 1)
+    } while (p.squaredLength() > 1)
 
     return p
 }
 
 export default class Lambertian implements Material {
     albedo: Vec3 = new Vec3(0.5, 0.5, 0.5)
-    constructor() {
 
+    constructor(albedo: Vec3 = new Vec3(0.5, 0.5, 0.5)) {
+
+        if (albedo) this.albedo = albedo
     }
 
     scatter(ray_in: Ray, hitRecord: HitRecord) {

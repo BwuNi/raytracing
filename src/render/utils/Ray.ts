@@ -9,6 +9,6 @@ export default class Ray {
     }
 
     getPoint(t: number) {
-        return this.direction.mul(t)
+        return this.origin.add(this.direction.mul(t))
     }
 }

@@ -10,29 +10,30 @@ import Lambertian from './utils/Lambertian'
 import Metal from './utils/Metal'
 
 export default function renderPixel(px: Px, width: number, height: number) {
-    const n = 1000
-    ;[px.r, px.g, px.b, px.a] = new Array(n)
-        .fill(0)
-        .map(m =>
-            sampling(
-                (px.x + Math.random()) / width,
-                (px.y + Math.random()) / height
+    const n = 100
+        ;[px.r, px.g, px.b, px.a] = new Array(n)
+            .fill(0)
+            .map(m =>
+                sampling(
+                    (px.x + Math.random()) / width,
+                    (px.y + Math.random()) / height,
+                )
             )
-        )
-        .reduce(
-            (res, v) => {
-                res[0] += v[0]
-                res[1] += v[1]
-                res[2] += v[2]
-                res[3] += v[3]
-                return res
-            },
-            [0, 0, 0, 0]
-        )
-        .map(v => (v / n) ** (3 / 4) * 255)
+            .reduce(
+                (res, v) => {
+                    res[0] += v[0]
+                    res[1] += v[1]
+                    res[2] += v[2]
+                    res[3] += v[3]
+                    return res
+                },
+                [0, 0, 0, 0]
+            )
+            .map(v => (v / n) ** (2 / 4) * 255)
 }
 
 function sampling(_x: number, _y: number) {
+
     const [x, y] = transform(_x, _y)
 
     const ray = camera.getRay(x, y)
@@ -48,11 +49,16 @@ function transform(x: number, y: number) {
     return [x, 1 - y]
 }
 
-const ball0 = new Sphere(new Vec3(0, 0, -1), 0.5)
-const ball1 = new Sphere(new Vec3(-1, 0, -1), 0.5)
-const ball2 = new Sphere(new Vec3(1, 0, -1), 0.5)
-const earth = new Sphere(new Vec3(0, -100.5, -1), 100)
-const world = new HitableList([ball0, ball1, ball2, earth])
+const ball0 = new Sphere(new Vec3(0, 0, -1), 0.5, new Lambertian(new Vec3(0.5, 0.5, 0.5)))
+const ball1 = new Sphere(new Vec3(-1, 0, -1), 0.5, new Metal(new Vec3(0.8, 0.8, 0.8)))
+const ball2 = new Sphere(new Vec3(1, 0, -1), 0.5, new Metal(new Vec3(0.8, 0.6, 0.2)))
+const earth = new Sphere(new Vec3(0, -10000.5, -1), 10000, new Lambertian(new Vec3(0.5, 0.5, 0.5)))
+const world = new HitableList([
+    ball0,
+     ball1, 
+     ball2, 
+    earth
+])
 
 const camera = new Camera(
     new Vec3(0, 0, 0), //origin
@@ -61,49 +67,38 @@ const camera = new Camera(
     new Vec3(0, 2, 0) //vertical
 )
 
-function randomInUnitSphere() {
-    let p: Vec3
-    do {
-        p = new Vec3(Math.random(), Math.random(), Math.random())
-            .mul(2.0)
-            .sub(new Vec3(1, 1, 1))
-    } while (p.squaredLength() >= 1)
-
-    return p
-}
-
-const lambertian = new Metal()
-
 function color(
     r: Ray,
     world: hitable,
     step: number = 0,
-    attenuation: number|Vec3 = 1
+    _attenuation: number | Vec3 = 1
 ): Vec3 {
     if (step > 50) return new Vec3(0, 0, 0)
 
-    let hitRecord = world.hit(r, 0.001, Infinity)
+    if (step > 2) {
+
+        Math.random()
+
+    }
+
+    let { hit, rayOut, attenuation } = world.hit(r, 0.001, Infinity)
+
+
 
     // 递归实现
-    if (hitRecord) {
-        const scattered = lambertian.scatter(r, hitRecord)
-
-        if (scattered) {
-            const target = hitRecord.p
-                .add(hitRecord.normal)
-                .add(randomInUnitSphere())
-
-            return color(scattered,world,50,lambertian.albedo.mul(attenuation))
+    if (hit) {
+        if (!rayOut) {
+            console.log(111)
+            return new Vec3(0, 0, 0)
         }
-        // return color(new Ray(hitRecord.p, target.sub(hitRecord.p)), world).mul(
-        //     0.5
-        // )
-        // return hitRecord.normal.add(1).mul(0.5)
+
+        return color(rayOut, world, ++step, attenuation.mul(_attenuation))
     }
     // 设置背景色
     const unitDirection = r.direction.unitVec(),
         t = (unitDirection.e1 + 1.0) * 0.5
 
     // return new Vec3(1, 1, 1)
-    return Vec3.add(new Vec3(1, 1, 1).mul(1 - t), new Vec3(0.5, 0.7, 1).mul(t)).mul(attenuation)
+    return Vec3.add(new Vec3(1, 1, 1).mul(1-t), new Vec3(0.3, 0.5, 1).mul(t)).mul(_attenuation)
+
 }

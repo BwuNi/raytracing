@@ -1,6 +1,6 @@
 import Vec3 from './Vec3'
 import Material from './material.interface'
-import Ray from './ray'
+import Ray from './Ray'
 import HitRecord from './HitRecord'
 
 function reflect(v: Vec3, n: Vec3) {
@@ -9,7 +9,10 @@ function reflect(v: Vec3, n: Vec3) {
 
 export default class Lambertian implements Material {
     albedo: Vec3 = new Vec3(0.5, 0.5, 0.5)
-    constructor() {}
+    constructor(albedo: Vec3 = new Vec3(0.5, 0.5, 0.5)) {
+
+        if (albedo) this.albedo = albedo
+    }
 
     scatter(
         rayin: Ray,
