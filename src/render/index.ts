@@ -8,6 +8,7 @@ import Vec3 from './utils/Vec3'
 import Ray from './utils/Ray'
 import Lambertian from './utils/Lambertian'
 import Metal from './utils/Metal'
+import Dielectirc from './utils/Dielectirc'
 
 export default function renderPixel(px: Px, width: number, height: number) {
     const n = 100
@@ -49,10 +50,18 @@ function transform(x: number, y: number) {
     return [x, 1 - y]
 }
 
-const ball0 = new Sphere(new Vec3(0, 0, -1), 0.5, new Lambertian(new Vec3(0.5, 0.5, 0.5)))
-const ball1 = new Sphere(new Vec3(-1, 0, -1), 0.5, new Metal(new Vec3(0.8, 0.8, 0.8)))
-const ball2 = new Sphere(new Vec3(1, 0, -1), 0.5, new Metal(new Vec3(0.8, 0.6, 0.2)))
-const earth = new Sphere(new Vec3(0, -10000.5, -1), 10000, new Lambertian(new Vec3(0.5, 0.5, 0.5)))
+const ball0 = new Sphere(
+    new Vec3(0, 0, -1), 0.5,
+     new Lambertian(new Vec3(0.5, 0.5, 0.5)))
+const ball1 = new Sphere(
+    new Vec3(-1, 0, -1), 0.5, 
+    new Metal(new Vec3(0.8, 0.8, 0.8)))
+const ball2 = new Sphere(
+    new Vec3(1, 0, -1), 0.5, 
+    new Dielectirc(new Vec3(0.8, 0.8, 0.8),1.3))
+const earth = new Sphere(
+    new Vec3(0, -10000.5, -1), 10000, 
+    new Lambertian(new Vec3(0.5, 0.5, 0.5)))
 const world = new HitableList([
     ball0,
      ball1, 
@@ -66,6 +75,7 @@ const camera = new Camera(
     new Vec3(4, 0, 0), //horizontal
     new Vec3(0, 2, 0) //vertical
 )
+
 
 function color(
     r: Ray,

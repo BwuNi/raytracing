@@ -88,7 +88,6 @@ const taskMsg: { [key: string]: Function } = {
 function performTask(task: RenderTask) {
     const worker = new Worker('./dist/task.worker.js')
 
-	console.log(2)
     worker.postMessage({
         method: 'render',
         args: [task]
