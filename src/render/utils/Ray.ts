@@ -19,13 +19,14 @@ export default class Ray {
     }
 
 
-    refract(normal: Vec3, n: number = 1,) :{
-        refract:Vec3,
-        refract_n:Vec3|number, 
-        reflect:Vec3,
-        reflect_n:Vec3|number,
-    }{
+    refract(normal: Vec3, nin: number = 1, nout: number = 1): {
+        refract: Vec3,
+        refract_n: Vec3 | number,
+        reflect: Vec3,
+        reflect_n: Vec3 | number,
+    } {
 
+        const n = nin / nout
 
         const reflect = this.reflect(normal)
 
@@ -39,14 +40,16 @@ export default class Ray {
         const sin_in = (1 - cos2_in) ** (1 / 2)
 
 
-        if ((sin_in / n) >= 1 ) {
+        if ((sin_in / n) >= 1) {
+            // 全反射
             return {
-                refract:null,
-                refract_n:0,
-                reflect:reflect,
-                reflect_n:1,
+                refract: null,
+                refract_n: 0,
+                reflect: reflect,
+                reflect_n: 1,
             }
         }
+
 
         const cos2_out = 1 - (1 - cos2_in) / (n ** 2)
 
@@ -63,34 +66,42 @@ export default class Ray {
         const dd = bb ** 2 - 4 * aa * cc
 
         if (dd > 0) {
+
+
+            const cos_in = cos2_in ** (1 / 2)
+            const cos_out = cos2_out ** (1 / 2)
+
+            const reflect_n = fresnel(cos_in, cos_out, nin, nout)
+
+            const refract_n = 1 - reflect_n
+
             const m = (-1 * bb - dd ** (1 / 2)) / (2 * aa)
             const n = (-1 * bb + dd ** (1 / 2)) / (2 * aa)
 
-            const r1 = new Vec3(
-                v.e0 + m * normal.e0,
-                v.e1 + m * normal.e1,
-                v.e2 + m * normal.e2)
-            const r2 = new Vec3(
-                v.e0 + n * normal.e0,
-                v.e1 + n * normal.e1,
-                v.e2 + n * normal.e2
-            )
+            const r1 = v.add(normal.mul(n))
+            const r2 = v.add(normal.mul(m))
 
             if (Vec3.dot(r1, v) > 0) return ({
-                refract:r1,
-                refract_n:1,
-                reflect:reflect,
-                reflect_n:0,
+                refract: r1,
+                refract_n: refract_n,
+                reflect: reflect,
+                reflect_n: reflect_n,
             })
             if (Vec3.dot(r2, v) > 0) return ({
-                refract:r2,
-                refract_n:1,
-                reflect:reflect,
-                reflect_n:0,
+                refract: r2,
+                refract_n: refract_n,
+                reflect: reflect,
+                reflect_n: reflect_n,
             })
         }
 
         return null
 
     }
+}
+
+function fresnel(cosi: number, cost: number, etai: number, etat: number) {
+    const rs = (etat * cosi - etai * cost) / (etat * cosi + etai * cost)
+    const rp = (etai * cosi - etat * cost) / (etai * cosi + etat * cost)
+    return (rs * rs + rp * rp) * 0.5;
 }
