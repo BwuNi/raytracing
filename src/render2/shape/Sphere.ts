@@ -2,17 +2,21 @@ import Ray from "../base/Ray";
 import HitRecord from './HitRecord'
 import Vec3 from "../base/Vec3";
 import Hitable from "./Hitable.interface"
+import Material from "../material/Material.interface";
 
 
 export default class Sphere implements Hitable{
 
     center: Vec3
-    radius: number
+	radius: number
+	material:Material
 
-    constructor(center: Vec3, r: number) {
+    constructor(center: Vec3, r: number,material:Material) {
 
         this.center = center
-        this.radius = r
+		this.radius = r
+		this.material = material
+		
     }
 
     hit(ray: Ray, t_min: number, t_max: number) {
@@ -34,8 +38,9 @@ export default class Sphere implements Hitable{
                 hit.p = ray.getPoint(temp)
                 hit.normal = hit.p.sub(this.center).div(this.radius)
 
+				
 
-                return hit
+                return this.material.getNextRay(ray,hit)
             }
             temp = (-b + Math.sqrt(discriminate)) / (2 * a)
             if (temp > t_min && temp < t_max) {
@@ -43,7 +48,7 @@ export default class Sphere implements Hitable{
                 hit.p = ray.getPoint(temp)
                 hit.normal = hit.p.sub(this.center).div(this.radius)
 
-                return hit
+                return this.material.getNextRay(ray,hit)
             }
         }
 

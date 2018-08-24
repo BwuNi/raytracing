@@ -11,7 +11,7 @@ import Metal from './utils/Metal'
 import Dielectirc from './utils/Dielectirc'
 
 export default function renderPixel(px: Px, width: number, height: number) {
-    const n = 100
+    const n = 1000
         ;[px.r, px.g, px.b, px.a] = new Array(n)
             .fill(0)
             .map(m =>
