@@ -12,7 +12,7 @@ const ctx = canvas.getContext('2d')
 const image = ctx.createImageData(width, height)
 const bar = document.getElementById('processline')
 
-initTasks(ctx,width,height, 4)
+initTasks(ctx, width, height, 4)
 
 function initTasks(
     ctx: CanvasRenderingContext2D,
@@ -23,20 +23,27 @@ function initTasks(
     const n = width * height
     const len = Math.ceil(n / amount)
 
-    let task = new RenderTask(0, [], width, height)
 
+    const pixels: Px[] = []
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
-            task.pixels.push(new Px(x, y))
+            pixels.push(new Px(x, y))
 
-            if (task.pixels.length >= len || y * width + x === n - 1) {
-                performTask(task)
-                task = new RenderTask(
-					(y * width + x +1) * 4 , 
-					[],
-					 width, height)
-            }
         }
+    }
+
+    let task = new RenderTask([], width, height)
+    while (pixels.length) {
+        const index = Math.floor(Math.random() * (pixels.length - 0.0001))
+		const px = pixels.splice(index, 1)[0]
+		
+		
+		task.pixels.push(px)
+
+		if (task.pixels.length >= len || pixels.length == 0 ) {
+			performTask(task)
+			task = new RenderTask([], width, height)
+		}
     }
 }
 
@@ -45,43 +52,38 @@ let complete = 0
 
 const taskMsg: { [key: string]: Function } = {
     partComplete(worker: Worker, task: RenderTask) {
-		
-		task.pixels.forEach((v,i)=>{
-            const _i = i * 4
-            image.data[_i + task.position] = v.r
-            image.data[_i + task.position + 1] = v.g
-            image.data[_i + task.position + 2] = v.b
-            image.data[_i + task.position + 3] = v.a
-		})
+        task.pixels.forEach((v, i) => {
+            const position = (v.x + v.y * task.width) * 4
+            image.data[position] = v.r
+            image.data[position + 1] = v.g
+            image.data[position + 2] = v.b
+            image.data[position + 3] = v.a
+        })
 
-		complete += task.pixels.length
-		bar.style.width = (complete/amount*100) +'%'
+        complete += task.pixels.length
+        bar.style.width = (complete / amount) * 100 + '%'
 
-		ctx.putImageData(image, 0, 0)
-		
-	},
+        ctx.putImageData(image, 0, 0)
+    },
 
-    allComplete(worker: Worker, task: RenderTask|null) {
-
-        if(task){
-            task.pixels.forEach((v,i)=>{
-                const _i = i * 4
-                image.data[_i + task.position] = v.r
-                image.data[_i + task.position + 1] = v.g
-                image.data[_i + task.position + 2] = v.b
-                image.data[_i + task.position + 3] = v.a
+    allComplete(worker: Worker, task: RenderTask | null) {
+        if (task) {
+            task.pixels.forEach((v, i) => {
+                const position = (v.x + v.y * task.width) * 4
+                image.data[position] = v.r
+                image.data[position + 1] = v.g
+                image.data[position + 2] = v.b
+                image.data[position + 3] = v.a
             })
-    
-            complete += task.pixels.length
-            bar.style.width = (complete/amount*100) +'%'
-    
-            ctx.putImageData(image, 0, 0)
-            
-        }
-		
-		worker.terminate()
 
-	}
+            complete += task.pixels.length
+            bar.style.width = (complete / amount) * 100 + '%'
+
+            ctx.putImageData(image, 0, 0)
+        }
+
+        worker.terminate()
+    }
 }
 
 // 执行一个 task

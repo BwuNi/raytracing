@@ -15,9 +15,17 @@ export default class Ray {
 
     reflect(hit: HitRecord) {
         return new Ray(hit.p, reflect(this.direction, hit.normal))
-    }
+	}
+	
+	refract(hit:HitRecord){
+
+	}
 }
 
 function reflect(v: Vec3, n: Vec3) {
     return v.sub(n.mul(Vec3.dot(v, n) * 2))
+}
+
+function refract(){
+	
 }

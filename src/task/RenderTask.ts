@@ -6,8 +6,7 @@ export default class RenderTask {
     width:number
     height:number
     
-    constructor(p: number, pixels: Px[] ,width:number,height:number) {
-        this.position = p
+    constructor(pixels: Px[] ,width:number,height:number) {
         this.pixels = pixels
         this.height = height
         this.width = width

@@ -21,7 +21,7 @@ function render(task: RenderTask) {
 	const { pixels, width, height, position } = task
 	const len = 400
 
-	let res = new RenderTask(position, [], width, height)
+	let res = new RenderTask([], width, height)
 
 	function doTask(i: number) {
 
@@ -37,7 +37,7 @@ function render(task: RenderTask) {
 
 		if ((i + len) < pixels.length) {
 
-			res = new RenderTask(position + (i + len) * 4, [], width, height)
+			res = new RenderTask([], width, height)
 
 			return setTimeout(() => {
 				doTask(i + len)

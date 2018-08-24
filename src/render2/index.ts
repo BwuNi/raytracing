@@ -38,7 +38,7 @@ const earth = new Sphere(
 
 const World = new HitList(ball, balll, ballll, earth)
 
-const n = 2000
+const n = 20
 
 export default function renderPixel(v: Px, width: number, height: number) {
     ;[v.r, v.g, v.b, v.a] = new Array(n)
