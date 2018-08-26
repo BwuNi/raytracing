@@ -6,6 +6,7 @@ import Sphere from './shape/Sphere'
 import HitList from './shape/HitList'
 import Metal from './material/Metal'
 import Lambertian from './material/Lambertian'
+import Dielectirc from './material/Dielectirc'
 
 const camera = new Camera(
     new Vec3(0, 0, 1), //origin
@@ -27,7 +28,7 @@ const balll = new Sphere(
 const ballll = new Sphere(
 	new Vec3(-1, 0, -1), 
 	0.5, 
-	new Lambertian(new Vec3(0.9,0.4,0.8))
+	new Dielectirc(new Vec3(1,1,1))
 )
 
 const earth = new Sphere(
@@ -38,7 +39,7 @@ const earth = new Sphere(
 
 const World = new HitList(ball, balll, ballll, earth)
 
-const n = 20
+const n = 1
 
 export default function renderPixel(v: Px, width: number, height: number) {
     ;[v.r, v.g, v.b, v.a] = new Array(n)
@@ -64,7 +65,7 @@ function color(_x: number, _y: number) {
 function trace(r: Ray, step = 0, n: number | Vec3 = 1) {
     if (step > 50) return new Vec3(0, 0, 0)
 
-    const hit = World.hit(r, 0, Infinity)
+    const hit = World.hit(r, 0.001, Infinity)
 
     let res: Vec3
 
