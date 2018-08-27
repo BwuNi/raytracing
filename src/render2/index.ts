@@ -27,8 +27,11 @@ const balll = new Sphere(
 )
 const ballll = new Sphere(
 	new Vec3(-1, 0, -1), 
-	0.5, 
-	new Dielectirc(new Vec3(1,1,1))
+    0.5, 
+    
+	// new Lambertian(new Vec3(0.5,1,1)),
+
+	new Dielectirc(new Vec3(0.5,1,1),1.2)
 )
 
 const earth = new Sphere(
@@ -39,7 +42,7 @@ const earth = new Sphere(
 
 const World = new HitList(ball, balll, ballll, earth)
 
-const n = 1
+const n = 10
 
 export default function renderPixel(v: Px, width: number, height: number) {
     ;[v.r, v.g, v.b, v.a] = new Array(n)
