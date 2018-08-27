@@ -24,26 +24,33 @@ function initTasks(
     const len = Math.ceil(n / amount)
 
 
-    const pixels: Px[] = []
+    const pixels: Px[][] = []
     for (let y = 0; y < height; y++) {
+        pixels.push([])
         for (let x = 0; x < width; x++) {
-            pixels.push(new Px(x, y))
-
+            pixels[y].push(new Px(x, y))
         }
     }
 
     let task = new RenderTask([], width, height)
     while (pixels.length) {
-        const index = Math.floor(Math.random() * (pixels.length - 0.0001))
-		const px = pixels.splice(index, 1)[0]
-		
-		
-		task.pixels.push(px)
 
-		if (task.pixels.length >= len || pixels.length == 0 ) {
-			performTask(task)
-			task = new RenderTask([], width, height)
-		}
+        const y = Math.floor(Math.random() * (pixels.length - 0.0001))
+
+        const pxs = pixels[y]
+
+        const x = Math.floor(Math.random() * (pxs.length - 0.0001))
+
+        const px = pxs.splice(x, 1)[0]
+
+        task.pixels.push(px)
+        
+        if (pxs.length == 0) pixels.splice(y, 1)
+
+        if (task.pixels.length >= len || pixels.length == 0) {
+            performTask(task)
+            task = new RenderTask([], width, height)
+        }
     }
 }
 
@@ -95,7 +102,7 @@ function performTask(task: RenderTask) {
         args: [task]
     })
 
-    worker.onmessage = function(res: {
+    worker.onmessage = function (res: {
         data: { method: string; args: any[] }
     }) {
         const { method, args } = res.data
