@@ -14,20 +14,10 @@ export default class Dielectirc implements Material {
 
     getNextRay(rayIn: Ray, hit: HitRecord) {
 
-        let _hit = hit
-        let ray: Ray = null
+        const ray = Vec3.dot(rayIn.direction, hit.normal) < 0
+            ? rayIn.refract(hit, 1/this.refractivity)
+            : rayIn.refract(new HitRecord(hit.t, hit.p, hit.normal.mul(-1)), this.refractivity)
 
-        if (Vec3.dot(rayIn.direction, hit.normal) > 0) {
-
-            _hit = new HitRecord(hit.t, hit.p, hit.normal.mul(-1))
-            ray = rayIn.refract(_hit, this.refractivity, 1)
-
-        } else {
-
-            ray = rayIn.refract(_hit, 1, this.refractivity)
-            
-        }
-        
         const attenuation = this.albedo
         return {
             hit,

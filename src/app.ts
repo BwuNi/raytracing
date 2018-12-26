@@ -12,6 +12,8 @@ const ctx = canvas.getContext('2d')
 const image = ctx.createImageData(width, height)
 const bar = document.getElementById('processline')
 
+const beginTime = (new Date()).getTime()
+
 initTasks(ctx, width, height, 4)
 
 function initTasks(
@@ -89,6 +91,8 @@ const taskMsg: { [key: string]: Function } = {
             ctx.putImageData(image, 0, 0)
         }
 
+        const time =(new Date()).getTime() -beginTime
+        console.log(time/100)
         worker.terminate()
     }
 }

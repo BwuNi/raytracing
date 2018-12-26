@@ -19,7 +19,7 @@ export default class Sphere implements Hitable{
 		
     }
 
-    hit(ray: Ray, t_min: number, t_max: number) {
+    nextRay(ray: Ray, t_min: number, t_max: number) {
 
         let hit = new HitRecord()
 
@@ -40,14 +40,14 @@ export default class Sphere implements Hitable{
 
                 return this.material.getNextRay(ray,hit)
             }
-            // temp = (-b + Math.sqrt(discriminate)) / (2 * a)
-            // if (temp > t_min && temp < t_max) {
-            //     hit.t = temp
-            //     hit.p = ray.getPoint(temp)
-            //     hit.normal = hit.p.sub(this.center).div(this.radius)
+            temp = (-b + Math.sqrt(discriminate)) / (2 * a)
+            if (temp > t_min && temp < t_max) {
+                hit.t = temp
+                hit.p = ray.getPoint(temp)
+                hit.normal = hit.p.sub(this.center).div(this.radius)
 
-            //     return this.material.getNextRay(ray,hit)
-            // }
+                return this.material.getNextRay(ray,hit)
+            }
         }
 
         return null

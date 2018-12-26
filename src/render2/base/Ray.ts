@@ -14,58 +14,53 @@ export default class Ray {
     }
 
     reflect(hit: HitRecord) {
-        return new Ray(hit.p, reflect(this.direction, hit.normal))
+        return new Ray(hit.p, reflect(this.direction.unitVec(), hit.normal))
     }
 
-    refract(hit: HitRecord, inside: number, outside: number) {
+    refract(hit: HitRecord,ref_idx:number) {
+        // let n = hit.normal
+        // let ref = ref_idx
 
-        const refraction = refract(this.direction, hit.normal, inside, outside)
+        // if(Vec3.dot(this.direction,n)>0 ){
+        //     n =n.mul(-1)
+        // }else{
+        //     ref= 1/ ref
+        // }
+        
+        // const refraction = refract(this.direction, n, ref)
 
-        if (refraction) return new Ray(hit.p, refraction)
-        else return this.reflect(hit)
+        
+
+        const refraction = refract(this.direction, hit.normal, ref_idx)
+
+        if (refraction) 
+            return new Ray(hit.p, refraction)
+        else 
+            return this.reflect(hit)
 
     }
 }
 
 
-function reflect(direction: Vec3, normal: Vec3) {
-    return direction.sub(normal.mul(Vec3.dot(direction, normal) * 2))
+function reflect(v: Vec3, n: Vec3) {
+    return v.sub(n.mul(Vec3.dot(v, n)).mul(2))
 }
 
-function refract(
-    direction: Vec3,
-    normal: Vec3,
-    inside: number,
-    outside: number
-) {
-    const _normal = normal.mul(-1)
+function refract(v: Vec3, n: Vec3,ni_over_nt:number) {
 
-    const cos2_in =
-        Vec3.dot(_normal, direction) ** 2 /
-        (_normal.squaredLength() * direction.squaredLength())
+    
+    const uv = v.unitVec()
+    const dt = Vec3.dot(uv,n)
+    const discriminant = 1.0 - (ni_over_nt**2) * (1 - dt ** 2)
 
-    const sin_in = (1 - cos2_in) ** (1 / 2)
-    const sin_out = sin_in * inside / outside
-
-    //全反射
-    if (sin_out > 1) {
+    if(discriminant<0) 
         return null
-    }
-
-    const cos2_out = 1 - sin_out ** 2
-
-    const x = direction.squaredLength()
-    const y = _normal.squaredLength()
-    const z = Vec3.dot(direction, _normal)
-
-    const a = y ** 2 * (1 - cos2_out)
-    const b = 2 * y * z * (1 - cos2_out)
-    const c = cos2_out * y * x - z ** 2
-
-    const d = (b ** 2 - 4 * a * c) ** 0.5
-
-    return (d
-        ? direction.add(_normal.mul((-b + d) / (2 * a)))
-        : null
-    )
+    else 
+        return (
+            uv.sub(n.mul(dt))
+            .mul(ni_over_nt)
+            .sub(n.mul(discriminant ** 0.5))
+        )
 }
+
+// return Some((uv - n * dt) * ni_over_nt - n * Math.sqrt(discriminant))

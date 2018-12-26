@@ -1,5 +1,5 @@
 import RenderTask from './task/RenderTask'
-import renderPixel from './render2/index'
+import renderPixel from './render/index'
 
 
 const appMsg: { [key: string]: Function } = {

@@ -5,8 +5,8 @@ import Camera from './base/Camera'
 import Sphere from './shape/Sphere'
 import HitList from './shape/HitList'
 import Metal from './material/Metal'
+import Dielectric from './material/Dielectric'
 import Lambertian from './material/Lambertian'
-import Dielectirc from './material/Dielectirc'
 
 const camera = new Camera(
     new Vec3(0, 0, 1), //origin
@@ -16,31 +16,30 @@ const camera = new Camera(
 )
 
 const ball = new Sphere(
-	new Vec3(0, 0, -1), 
-	0.5, 
-	new Metal(new Vec3(0.8,0.4,0.9),0.5)
+    new Vec3(0, 0, -1),
+    0.5,
+    new Metal(new Vec3(0.8, 0.4, 0.9), 0.5)
 )
 const balll = new Sphere(
-	new Vec3(1, 0, -1), 
-	0.5, 
-	new Metal(new Vec3(0.8,0.9,0.4),0.1)
+    new Vec3(1, 0, -1),
+    0.5,
+    new Metal(new Vec3(0.8, 0.9, 0.4), 0.1)
 )
 const ballll = new Sphere(
-	new Vec3(-1, 0, -1), 
-    0.5, 
-	// new Lambertian(new Vec3(0.5,1,1)),
-	new Dielectirc(new Vec3(1,1,1),1.5)
+    new Vec3(-1, 0, -1),
+    0.5,
+    new Dielectric(new Vec3(1,1,1), 1.5)
 )
 
 const earth = new Sphere(
-    new Vec3(0, -100.5, -1), 
-    100, 
-    new Metal(0.5,0.2)
+    new Vec3(0, -100.5, -1),
+    100,
+    new Metal(0.5, 0.2)
 )
 
 const World = new HitList(ball, balll, ballll, earth)
 
-const n = 10
+const n = 50
 
 export default function renderPixel(v: Px, width: number, height: number) {
     ;[v.r, v.g, v.b, v.a] = new Array(n)
@@ -63,24 +62,18 @@ function color(_x: number, _y: number) {
     return [res.e0, res.e1, res.e2]
 }
 
-function trace(r: Ray, step = 0, n: number | Vec3 = 1) {
+function trace(r: Ray, step = 0): Vec3 {
     if (step > 50) return new Vec3(0, 0, 0)
 
-    const hit = World.hit(r, 0.001, Infinity)
+    const res = World.nextRay(r, 0.001, Infinity)
 
-    let res: Vec3
-
-    if (hit) {
-        res = trace(hit.ray, ++step, hit.attenuation.mul(n))
+    if (res) {
+        return trace(res[1], ++step).mul(res[2])
     } else {
         // 设置背景色
-        const unitDirection = r.direction.unitVec(),
+        const
+            unitDirection = r.direction.unitVec(),
             t = (unitDirection.e1 + 1.0) * 0.5
-
-        res = Vec3.add(
-            new Vec3(1, 1, 1).mul(1 - t),
-            new Vec3(0.3, 0.5, 1).mul(t)
-        ).mul(n)
+        return Vec3.add(new Vec3(1, 1, 1).mul(1 - t), new Vec3(0.3, 0.5, 1).mul(t))
     }
-    return res
 }
