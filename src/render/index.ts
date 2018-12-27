@@ -7,13 +7,15 @@ import HitList from './shape/HitList'
 import Metal from './material/Metal'
 import Dielectric from './material/Dielectric'
 import Lambertian from './material/Lambertian'
+import hitable from './shape/Hitable.interface';
 
 const camera = new Camera(
-    new Vec3(0, 0, 1), //origin
-    new Vec3(-2, -1, -1), //leftBottom
-    new Vec3(4, 0, 0), //horizontal
-    new Vec3(0, 2, 0) //vertical
+    new Vec3(9,1.5,2),
+    new Vec3(0,0,-1),
+    new Vec3(0,1,0),
+    30,2,0
 )
+
 
 const ball = new Sphere(
     new Vec3(0, 0, -1),
@@ -28,7 +30,12 @@ const balll = new Sphere(
 const ballll = new Sphere(
     new Vec3(-1, 0, -1),
     0.5,
-    new Dielectric(new Vec3(1,1,1), 1.5)
+    new Dielectric(new Vec3(1, 1, 1), 1.5)
+)
+const ballll_inside = new Sphere(
+    new Vec3(-1, 0, -1),
+    -0.45,
+    new Dielectric(new Vec3(1, 1, 1), 1.5)
 )
 
 const earth = new Sphere(
@@ -37,9 +44,10 @@ const earth = new Sphere(
     new Metal(0.5, 0.2)
 )
 
-const World = new HitList(ball, balll, ballll, earth)
+//const World = new HitList(ball, balll, ballll,ballll_inside, earth)
+const world =createSence()
 
-const n = 50
+const n = 10
 
 export default function renderPixel(v: Px, width: number, height: number) {
     ;[v.r, v.g, v.b, v.a] = new Array(n)
@@ -65,7 +73,7 @@ function color(_x: number, _y: number) {
 function trace(r: Ray, step = 0): Vec3 {
     if (step > 50) return new Vec3(0, 0, 0)
 
-    const res = World.nextRay(r, 0.001, Infinity)
+    const res = world.nextRay(r, 0.001, Infinity)
 
     if (res) {
         return trace(res[1], ++step).mul(res[2])
@@ -76,4 +84,56 @@ function trace(r: Ray, step = 0): Vec3 {
             t = (unitDirection.e1 + 1.0) * 0.5
         return Vec3.add(new Vec3(1, 1, 1).mul(1 - t), new Vec3(0.3, 0.5, 1).mul(t))
     }
+}
+
+
+function createSence():hitable{
+    const list:hitable[] = (new Array(20)).fill(0).map((v,_a)=>(new Array(20)).fill(0).map((v,_b)=>{
+        const a = _a - 11
+        const b = _b - 11
+        const choose_mat =  Math.random()
+        const center = new Vec3(a+0.9*Math.random(),0.2,b+0.9*Math.random())
+        if(center.sub(new Vec3(4,0.2,0)).length()>0.9){
+            if(choose_mat<0.8){
+                return new Sphere(center,0.2,
+                    new Lambertian(new Vec3(Math.random()*Math.random(),Math.random()*Math.random(),Math.random()*Math.random()))
+                )
+            }else if((choose_mat<0.95)){
+                return new Sphere(center,0.2,
+                    new Metal(new Vec3(0.5*(1+Math.random()),0.5*(1+Math.random()),0.5*(1+Math.random())),0.5*(1+Math.random()))
+                )
+            }else {
+                return new Sphere(center,0.2,
+                    new Dielectric(new Vec3(1,1,1),1.5)
+                )
+            }
+        }
+    })).reduce((a,b)=>a.concat(b)).filter(i=>i)
+
+    list.push(
+        new Sphere(new Vec3(4,1,0),1,
+            new Metal(new Vec3(0.7,0.6,0.5),0)
+        )
+    )
+
+    list.push(
+        new Sphere(new Vec3(-4,1,0),1,
+            new Lambertian(new Vec3(0.4,0.2,0.1))
+        )
+    )
+
+    list.push(
+        new Sphere(new Vec3(0,1,0),1,
+            new Dielectric(new Vec3(1,1,1),1.5)
+        )
+    )
+
+    list.push(
+        new Sphere(new Vec3(0,-1000,0),1000,
+        new Lambertian(new Vec3(0.5,0.5,0.5))
+        )
+    )
+
+    return new HitList(...list)
+
 }

@@ -9,10 +9,7 @@ import Lambertian from './material/Lambertian'
 import Dielectirc from './material/Dielectirc'
 
 const camera = new Camera(
-    new Vec3(0, 0, 1), //origin
-    new Vec3(-2, -1, -1), //leftBottom
-    new Vec3(4, 0, 0), //horizontal
-    new Vec3(0, 2, 0) //vertical
+    30,2
 )
 
 const ball = new Sphere(
