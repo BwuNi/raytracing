@@ -11,6 +11,29 @@ function randomVec2(): Vec3 {
         if (Vec3.dot(p,p)> 1) return p
     }
 }
+export class Camera2 {
+
+    origin: Vec3
+    vertical: Vec3
+    horizontal: Vec3
+    leftBottom: Vec3
+
+    constructor(origin: Vec3, leftBottom: Vec3, horizontal: Vec3, vertical: Vec3) {
+        this.origin = origin
+        this.vertical = vertical
+        this.leftBottom = leftBottom
+        this.horizontal = horizontal
+    }
+
+    getRay(x: number, y: number): Ray {
+        return new Ray(
+            this.origin,
+            this.leftBottom
+                .add(this.horizontal.mul(x))
+                .add(this.vertical.mul(y))
+                .sub(this.origin))
+    }
+}
 
 export default class Camera {
 

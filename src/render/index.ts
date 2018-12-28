@@ -1,7 +1,7 @@
 import Px from '../task/Px'
 import Ray from './base/Ray'
 import Vec3 from './base/Vec3'
-import Camera from './base/Camera'
+import Camera, { Camera2 } from './base/Camera'
 import Sphere from './shape/Sphere'
 import HitList from './shape/HitList'
 import Metal from './material/Metal'
@@ -9,13 +9,23 @@ import Dielectric from './material/Dielectric'
 import Lambertian from './material/Lambertian'
 import hitable from './shape/Hitable.interface';
 
-const camera = new Camera(
-    new Vec3(9,1.5,2),
-    new Vec3(0,0,-1),
-    new Vec3(0,1,0),
-    30,2,0
-)
 
+const random = function (seed: number) { return parseFloat('0.' + Math.sin(seed).toString().substr(6)); }
+
+const camera = new Camera(
+    new Vec3(9, 1.1, 2),
+    new Vec3(0, 0.6, -1),
+    new Vec3(0, 1, 0),
+    30, 2, 0.05,
+
+    new Vec3(9, 1.5, 2).sub(new Vec3(0, 0, -1)).length() * 0.5
+)
+const camera2 = new Camera2(
+    new Vec3(0, 0, 0),
+    new Vec3(-2, -1, -1),
+    new Vec3(4, 0, 0),
+    new Vec3(0, 2, 0),
+)
 
 const ball = new Sphere(
     new Vec3(0, 0, -1),
@@ -44,10 +54,22 @@ const earth = new Sphere(
     new Metal(0.5, 0.2)
 )
 
-//const World = new HitList(ball, balll, ballll,ballll_inside, earth)
+//const world = new HitList(ball, balll, ballll,ballll_inside, earth)
 const world =createSence()
+// const world = new HitList(
+//     new Sphere(
+//         new Vec3(0, 0, -1),
+//         0.5,
+//         new Lambertian(new Vec3(0.5, 0.5, 0.5))
+//     ),
+//     new Sphere(
+//         new Vec3(0, -100.5, -1),
+//         100,
+//         new Lambertian(new Vec3(0.5, 0.5, 0.5))
+//     ),
+// )
 
-const n = 10
+const n = 50
 
 export default function renderPixel(v: Px, width: number, height: number) {
     ;[v.r, v.g, v.b, v.a] = new Array(n)
@@ -56,7 +78,7 @@ export default function renderPixel(v: Px, width: number, height: number) {
             color((v.x + Math.random()) / width, (v.y + Math.random()) / height)
         )
         .reduce((res, v) => res.map((item, i) => (item += v[i])), [0, 0, 0])
-        .map(v => Math.floor((v / n) * 255.99))
+        .map(v => Math.floor((v / n) ** 0.5 * 255.99))
         .concat([255])
 }
 
@@ -87,50 +109,50 @@ function trace(r: Ray, step = 0): Vec3 {
 }
 
 
-function createSence():hitable{
-    const list:hitable[] = (new Array(20)).fill(0).map((v,_a)=>(new Array(20)).fill(0).map((v,_b)=>{
+function createSence(): hitable {
+    const list: hitable[] = (new Array(20)).fill(0).map((v, _a) => (new Array(20)).fill(0).map((v, _b) => {
         const a = _a - 11
         const b = _b - 11
-        const choose_mat =  Math.random()
-        const center = new Vec3(a+0.9*Math.random(),0.2,b+0.9*Math.random())
-        if(center.sub(new Vec3(4,0.2,0)).length()>0.9){
-            if(choose_mat<0.8){
-                return new Sphere(center,0.2,
-                    new Lambertian(new Vec3(Math.random()*Math.random(),Math.random()*Math.random(),Math.random()*Math.random()))
+        const choose_mat = random(a * 310 + b)
+        const center = new Vec3(a + 0.9 * random(a * 311 + b), 0.2, b + 0.9 * random(a * 312 + b))
+        if (center.sub(new Vec3(4, 0.2, 0)).length() > 0.9) {
+            if (choose_mat < 0.8) {
+                return new Sphere(center, 0.2,
+                    new Lambertian(new Vec3(random(a * 313 + b) * random(a * 314 + b), random(a * 315 + b) * random(a * 316 + b), random(a * 317 + b) * random(a * 318 + b)))
                 )
-            }else if((choose_mat<0.95)){
-                return new Sphere(center,0.2,
-                    new Metal(new Vec3(0.5*(1+Math.random()),0.5*(1+Math.random()),0.5*(1+Math.random())),0.5*(1+Math.random()))
+            } else if ((choose_mat < 0.95)) {
+                return new Sphere(center, 0.2,
+                    new Metal(new Vec3(0.5 * (random(a * 319 + b)), 0.5 * (1 + random(a * 320 + b)), 0.5 * (1 + random(a * 321 + b))), 0.5 * (1 + random(a * 322 + b)))
                 )
-            }else {
-                return new Sphere(center,0.2,
-                    new Dielectric(new Vec3(1,1,1),1.5)
+            } else {
+                return new Sphere(center, 0.2,
+                    new Dielectric(new Vec3(1, 1, 1), 1.5)
                 )
             }
         }
-    })).reduce((a,b)=>a.concat(b)).filter(i=>i)
+    })).reduce((a, b) => a.concat(b)).filter(i => i)
 
     list.push(
-        new Sphere(new Vec3(4,1,0),1,
-            new Metal(new Vec3(0.7,0.6,0.5),0)
+        new Sphere(new Vec3(4, 1, 0), 1,
+            new Metal(new Vec3(0.7, 0.6, 0.5), 0)
         )
     )
 
     list.push(
-        new Sphere(new Vec3(-4,1,0),1,
-            new Lambertian(new Vec3(0.4,0.2,0.1))
+        new Sphere(new Vec3(-4, 1, 0), 1,
+            new Lambertian(new Vec3(0.4, 0.2, 0.1))
         )
     )
 
     list.push(
-        new Sphere(new Vec3(0,1,0),1,
-            new Dielectric(new Vec3(1,1,1),1.5)
+        new Sphere(new Vec3(0, 1, 0), 1,
+            new Dielectric(new Vec3(1, 1, 1), 1.5)
         )
     )
 
     list.push(
-        new Sphere(new Vec3(0,-1000,0),1000,
-        new Lambertian(new Vec3(0.5,0.5,0.5))
+        new Sphere(new Vec3(0, -1000, 0), 1000,
+            new Lambertian(new Vec3(0.5, 0.5, 0.5))
         )
     )
 

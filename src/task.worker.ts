@@ -19,7 +19,7 @@ onmessage = function (e) {
 function render(task: RenderTask) {
 
 	const { pixels, width, height, position } = task
-	const len = 400
+	const len = 40
 
 	let res = new RenderTask([], width, height)
 

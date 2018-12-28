@@ -24,7 +24,7 @@ export default class Lambertian implements Material {
     }
 
     getNextRay(rayIn: Ray, hit: HitRecord) :HitResult{
-        const ray = new Ray(hit.p,hit.p.add(hit.normal).add(randomInUnitSphere()))
+        const ray = new Ray(hit.p,hit.normal.add(randomInUnitSphere()))
         const attenuation = this.albedo
         return [hit,ray,attenuation]
     }
