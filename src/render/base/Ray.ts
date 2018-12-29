@@ -1,5 +1,5 @@
 import Vec3 from './Vec3'
-import HitRecord from '../shape/HitRecord'
+import HitRecord from '../shape/HitRecord';
 
 export default class Ray {
     origin: Vec3
@@ -14,7 +14,7 @@ export default class Ray {
     }
 
     reflect(hit: HitRecord) {
-        return new Ray(hit.p, reflect(this.direction.unitVec(), hit.normal))
+        return new Ray(hit.p, reflect(this.direction, hit.normal))
     }
 
     refract(hit: HitRecord,ref:number){
@@ -39,29 +39,24 @@ export default class Ray {
     }
 }
 
-
 function reflect(v: Vec3, n: Vec3) {
-    return v.sub(n.mul(Vec3.dot(v, n)).mul(2))
+    return v.sub(n.mul(Vec3.dot(v, n) * 2))
 }
 
-function refract(v:Vec3,n:Vec3,ni_over_nt:number){
-
-    if(ni_over_nt>1){
-        v.sub(1)
-    }else{
-        v.sub(2)
-    }
-
+function refract(v: Vec3, n: Vec3,ni_over_nt:number) {
     const uv = v.unitVec()
     const dt = Vec3.dot(uv,n)
-    const discriminant = 1.0 - ni_over_nt **2 *(1- dt**2)
+    const discriminant = 1.0 - ni_over_nt * ni_over_nt * (1 - dt * dt)
 
-    if(discriminant >0){
-        return Vec3.sub(
-            uv.sub(n.mul(dt)).mul(ni_over_nt),
-            n.mul(discriminant**0.5)
+    if(discriminant<0) 
+        return null
+    else 
+        return (
+            uv
+            .sub(n.mul(dt))
+            .mul(ni_over_nt)
+            .sub(n.mul(discriminant ** 0.5))
         )
-    }else return null
 }
 
 function schlick(cosine:number,ref_idx:number):number{

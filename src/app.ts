@@ -12,7 +12,6 @@ const ctx = canvas.getContext('2d')
 const image = ctx.createImageData(width, height)
 const bar = document.getElementById('processline')
 
-const beginTime = (new Date()).getTime()
 
 initTasks(ctx, width, height, 4)
 
@@ -56,8 +55,36 @@ function initTasks(
     }
 }
 
+
+// 执行一个 task
+function performTask(task: RenderTask) {
+
+    const worker = new Worker('./dist/task.worker.js')
+
+    worker.postMessage({
+        method: 'render',
+        args: [task]
+    })
+
+    worker.onmessage = function (res: {
+        data: { method: string; args: any[] }
+    }) {
+        const { method, args } = res.data
+
+        if (taskMsg[method]) {
+            taskMsg[method](worker, ...args)
+        } else {
+            alert(`app : can't find method (${method})`)
+        }
+    }
+
+}
+
+
+
 const amount = width * height
 let complete = 0
+
 
 const taskMsg: { [key: string]: Function } = {
     partComplete(worker: Worker, task: RenderTask) {
@@ -86,35 +113,14 @@ const taskMsg: { [key: string]: Function } = {
             })
 
             complete += task.pixels.length
-            bar.style.width = (complete / amount) * 100 + '%'
+            bar.style.width = ((complete / amount) > 1 ? 1 : (complete / amount)) * 100 + '%'
+
+
+            console.log(complete)
 
             ctx.putImageData(image, 0, 0)
         }
 
-        const time =(new Date()).getTime() -beginTime
-        console.log(time/100)
         worker.terminate()
-    }
-}
-
-// 执行一个 task
-function performTask(task: RenderTask) {
-    const worker = new Worker('./dist/task.worker.js')
-
-    worker.postMessage({
-        method: 'render',
-        args: [task]
-    })
-
-    worker.onmessage = function (res: {
-        data: { method: string; args: any[] }
-    }) {
-        const { method, args } = res.data
-
-        if (taskMsg[method]) {
-            taskMsg[method](worker, ...args)
-        } else {
-            alert(`app : can't find method (${method})`)
-        }
     }
 }

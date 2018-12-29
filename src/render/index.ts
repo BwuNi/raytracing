@@ -1,116 +1,119 @@
 import Px from '../task/Px'
 import Ray from './base/Ray'
 import Vec3 from './base/Vec3'
-import Camera, { Camera2 } from './base/Camera'
-import Sphere from './shape/Sphere'
+import Camera from './base/Camera'
+import Sphere from './shape/Sphere';
+// import Sphere from './shape/Sphere'
 import HitList from './shape/HitList'
-import Metal from './material/Metal'
-import Dielectric from './material/Dielectric'
-import Lambertian from './material/Lambertian'
-import hitable from './shape/Hitable.interface';
+import Hitable from './shape/Hitable.interface'
+import Metal from './material/Metal';
+import Lambertian from './material/Lambertian';
+import Dielectric from './material/Dielectric';
+// import Metal from './material/Metal'
+// import Dielectric from './material/Dielectric'
+// import Lambertian from './material/Lambertian'
+// import hitable from './shape/Hitable.interface';
 
+const n = 1
 
-const random = function (seed: number) { return parseFloat('0.' + Math.sin(seed).toString().substr(6)); }
+export default function renderPixel(
+    v: Px,
+    width: number,
+    height: number) {
+
+    ;[v.r, v.g, v.b, v.a] = (new Array(n))
+        .fill(0)
+        .map(m => color((v.x + Math.random()) / width, (v.y + Math.random()) / height))
+        .reduce((res, v) => res.map((item, i) => item += v[i]), [0, 0, 0])
+        .map(v => Math.floor((v / n)**0.5 * 255.99))
+        .concat([255])
+}
+const ball = new Sphere(
+	new Vec3(0, 0, -1), 
+	0.5, 
+	new Metal(new Vec3(0.8,0.4,0),0.5)
+)
+const balll = new Sphere(
+	new Vec3(1, 0, -1), 
+	0.5, 
+	new Metal(new Vec3(0.8,0,0.4),1)
+)
+const ballll = new Sphere(
+	new Vec3(-1, 0, -1), 
+	0.5, 
+	new Dielectric(new Vec3(1,1,1) ,1.5)
+)
+
+const ballll_inside = new Sphere(
+    new Vec3(-1, 0, -1),
+    -0.45,
+    new Dielectric(new Vec3(1, 1, 1), 1.5)
+)
+const earth = new Sphere(
+    new Vec3(0, -100.5, -1), 
+    100,
+    new Metal(0.5,0.2)
+)
+
+const world = new HitList(
+    ball, balll, ballll,ballll_inside, earth
+)
+
+// const camera = new Camera(
+//     new Vec3(-2,2,1),
+//     new Vec3(0,0,-1),
+//     new Vec3(0,1,0),
+//     30,2,0.5
+// )
+
 
 const camera = new Camera(
     new Vec3(9, 1.1, 2),
     new Vec3(0, 0.6, -1),
     new Vec3(0, 1, 0),
     30, 2, 0.05,
-
     new Vec3(9, 1.5, 2).sub(new Vec3(0, 0, -1)).length() * 0.5
 )
-const camera2 = new Camera2(
-    new Vec3(0, 0, 0),
-    new Vec3(-2, -1, -1),
-    new Vec3(4, 0, 0),
-    new Vec3(0, 2, 0),
-)
-
-const ball = new Sphere(
-    new Vec3(0, 0, -1),
-    0.5,
-    new Metal(new Vec3(0.8, 0.4, 0.9), 0.5)
-)
-const balll = new Sphere(
-    new Vec3(1, 0, -1),
-    0.5,
-    new Metal(new Vec3(0.8, 0.9, 0.4), 0.1)
-)
-const ballll = new Sphere(
-    new Vec3(-1, 0, -1),
-    0.5,
-    new Dielectric(new Vec3(1, 1, 1), 1.5)
-)
-const ballll_inside = new Sphere(
-    new Vec3(-1, 0, -1),
-    -0.45,
-    new Dielectric(new Vec3(1, 1, 1), 1.5)
-)
-
-const earth = new Sphere(
-    new Vec3(0, -100.5, -1),
-    100,
-    new Metal(0.5, 0.2)
-)
-
-//const world = new HitList(ball, balll, ballll,ballll_inside, earth)
-const world =createSence()
-// const world = new HitList(
-//     new Sphere(
-//         new Vec3(0, 0, -1),
-//         0.5,
-//         new Lambertian(new Vec3(0.5, 0.5, 0.5))
-//     ),
-//     new Sphere(
-//         new Vec3(0, -100.5, -1),
-//         100,
-//         new Lambertian(new Vec3(0.5, 0.5, 0.5))
-//     ),
-// )
-
-const n = 50
-
-export default function renderPixel(v: Px, width: number, height: number) {
-    ;[v.r, v.g, v.b, v.a] = new Array(n)
-        .fill(0)
-        .map(m =>
-            color((v.x + Math.random()) / width, (v.y + Math.random()) / height)
-        )
-        .reduce((res, v) => res.map((item, i) => (item += v[i])), [0, 0, 0])
-        .map(v => Math.floor((v / n) ** 0.5 * 255.99))
-        .concat([255])
-}
 
 function color(_x: number, _y: number) {
     const [x, y] = [_x, 1 - _y]
 
     const r = camera.getRay(x, y)
 
-    const res = trace(r)
+    const res = trace(createSence(), r)
 
     return [res.e0, res.e1, res.e2]
 }
 
-function trace(r: Ray, step = 0): Vec3 {
+
+function trace(sence: Hitable, r: Ray, step = 0): Vec3 {
+
     if (step > 50) return new Vec3(0, 0, 0)
 
-    const res = world.nextRay(r, 0.001, Infinity)
+    const hit = sence.hit(r, 0.0000001, Infinity)
 
-    if (res) {
-        return trace(res[1], ++step).mul(res[2])
+    let res: Vec3
+
+
+    if (hit) {
+        res = trace(world, hit[1], ++step).mul(hit[2])
     } else {
         // 设置背景色
-        const
-            unitDirection = r.direction.unitVec(),
+        const unitDirection = r.direction.unitVec(),
             t = (unitDirection.e1 + 1.0) * 0.5
-        return Vec3.add(new Vec3(1, 1, 1).mul(1 - t), new Vec3(0.3, 0.5, 1).mul(t))
+
+        res = Vec3.add(
+            new Vec3(1, 1, 1).mul(1 - t),
+            new Vec3(0.3, 0.5, 1).mul(t)
+        )
     }
+    return res
 }
 
+function random(seed: number) { return parseFloat('0.' + Math.sin(seed).toString().substr(6)); }
 
-function createSence(): hitable {
-    const list: hitable[] = (new Array(20)).fill(0).map((v, _a) => (new Array(20)).fill(0).map((v, _b) => {
+function createSence(): Hitable {
+    const list: Hitable[] = (new Array(20)).fill(0).map((v, _a) => (new Array(20)).fill(0).map((v, _b) => {
         const a = _a - 11
         const b = _b - 11
         const choose_mat = random(a * 310 + b)

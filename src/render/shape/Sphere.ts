@@ -1,25 +1,23 @@
-import Ray from "../base/Ray";
+import Ray from "../base/Ray"
 import HitRecord from './HitRecord'
-import Vec3 from "../base/Vec3";
-import Hitable from "./Hitable.interface"
+import Vec3 from "../base/Vec3"
+import Hitable, { HitResult } from "./Hitable.interface"
 import Material from "../material/Material.interface";
 
 
-export default class Sphere implements Hitable{
+export default class Sphere implements Hitable {
 
     center: Vec3
-	radius: number
-	material:Material
-
-    constructor(center: Vec3, r: number,material:Material) {
+    radius: number
+    material: Material
+    constructor(center: Vec3, r: number, material: Material) {
 
         this.center = center
-		this.radius = r
-		this.material = material
-		
+        this.radius = r
+        this.material = material
     }
 
-    nextRay(ray: Ray, t_min: number, t_max: number) {
+    hit(ray: Ray, t_min: number, t_max: number): HitResult {
 
         let hit = new HitRecord()
 
@@ -37,8 +35,9 @@ export default class Sphere implements Hitable{
                 hit.t = temp
                 hit.p = ray.getPoint(temp)
                 hit.normal = hit.p.sub(this.center).div(this.radius)
-
-                return this.material.getNextRay(ray,hit)
+                
+                const [a, b] = this.material.scatter(ray, hit)
+                return [hit, a, b]
             }
             temp = (-b + Math.sqrt(discriminate)) / (2 * a)
             if (temp > t_min && temp < t_max) {
@@ -46,10 +45,10 @@ export default class Sphere implements Hitable{
                 hit.p = ray.getPoint(temp)
                 hit.normal = hit.p.sub(this.center).div(this.radius)
 
-                return this.material.getNextRay(ray,hit)
+                const [a, b] = this.material.scatter(ray, hit)
+                return [hit, a, b]
             }
         }
-
         return null
     }
 

@@ -1,4 +1,5 @@
-export default class Px {
+export default class Px{
+
     r: number
     g: number
     b: number
@@ -10,7 +11,7 @@ export default class Px {
     constructor(x: number, y: number) {
         this.x = x
         this.y = y
-		this.r = this.g = this.b = this.a = 0
-		
+        this.r = this.g = this.b = this.a = 0
+
     }
 }
