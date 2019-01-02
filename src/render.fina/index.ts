@@ -3,7 +3,6 @@ import Ray from './base/Ray'
 import Vec3 from './base/Vec3'
 import Camera from './base/Camera'
 import Sphere from './shape/Sphere'
-import MovingSphere from './shape/MovingSphere'
 import HitList from './shape/HitList'
 import Metal from './material/Metal'
 import Dielectric from './material/Dielectric'
@@ -18,7 +17,7 @@ const camera = new Camera(
     new Vec3(0, 0.6, -1),
     new Vec3(0, 1, 0),
     30, 2, 0.05,
-    0,1,
+
     new Vec3(9, 1.5, 2).sub(new Vec3(0, 0, -1)).length() * 0.5
 )
 
@@ -52,7 +51,7 @@ const earth = new Sphere(
 
 const world =createSence()
 
-const n = 100
+const n = 1
 
 export default function renderPixel(v: Px, width: number, height: number) {
     ;[v.r, v.g, v.b, v.a] = new Array(n)
@@ -100,12 +99,8 @@ function createSence(): hitable {
         const center = new Vec3(a + 0.9 * random(a * 311 + b), 0.2, b + 0.9 * random(a * 312 + b))
         if (center.sub(new Vec3(4, 0.2, 0)).length() > 0.9) {
             if (choose_mat < 0.4) {
-                return new MovingSphere(
-                    center,
-                    center.add(new Vec3(0,random(a * 316 + b),0).mul(0.5)), 
-                    0.2,
-                    new Lambertian(new Vec3(random(a * 313 + b) * random(a * 314 + b), random(a * 315 + b) * random(a * 316 + b), random(a * 317 + b) * random(a * 318 + b))),
-                    camera.time0,camera.time1
+                return new Sphere(center, 0.2,
+                    new Lambertian(new Vec3(random(a * 313 + b) * random(a * 314 + b), random(a * 315 + b) * random(a * 316 + b), random(a * 317 + b) * random(a * 318 + b)))
                 )
             } else if ((choose_mat < 0.7)) {
                 return new Sphere(center, 0.2,

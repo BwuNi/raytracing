@@ -4,10 +4,8 @@ import HitRecord from '../shape/HitRecord'
 export default class Ray {
     origin: Vec3
     direction: Vec3
-    time:number
-    constructor(origin: Vec3, direction: Vec3,time:number) {
+    constructor(origin: Vec3, direction: Vec3) {
         this.origin = origin
-        this.time = time
         this.direction = direction
     }
 
@@ -16,7 +14,7 @@ export default class Ray {
     }
 
     reflect(hit: HitRecord) {
-        return new Ray(hit.p, reflect(this.direction.unitVec(), hit.normal),this.time)
+        return new Ray(hit.p, reflect(this.direction.unitVec(), hit.normal))
     }
 
     refract(hit: HitRecord,ref:number){
@@ -35,7 +33,7 @@ export default class Ray {
         
         const res = refract(this.direction,outWard_normal,ni_over_nt)
 
-        if(res && (Math.random() > schlick(consine,ni_over_nt))) return new Ray(hit.p,res,this.time)
+        if(res && (Math.random() > schlick(consine,ni_over_nt))) return new Ray(hit.p,res)
         else return this.reflect(hit)
 
     }
