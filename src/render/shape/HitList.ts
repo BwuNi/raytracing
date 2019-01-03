@@ -14,17 +14,18 @@ export default class HitList {
 
     hit(ray: Ray, t_min: number, t_max: number): HitResult {
         let closest_t = t_max,
-            hit: HitResult = null
+            res: HitResult = null
 
         this.list.forEach(v => {
             var _hit = v.hit(ray, t_min, t_max)
             if (_hit && (_hit[0].t < closest_t)) {
-                hit = _hit
+                res = _hit
                 closest_t = _hit[0].t
             }
+
         })
 
-        return hit
+        return res
     }
 
 }

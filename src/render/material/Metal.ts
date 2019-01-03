@@ -1,4 +1,4 @@
-import Material from './Material.interface'
+import Material, { Attenuation } from './Material.interface'
 import Ray from '../base/Ray'
 import HitRecord from '../shape/HitRecord'
 import Vec3 from '../base/Vec3'
@@ -14,12 +14,11 @@ function randomInUnitSphere() {
     return p
 }
 
-
 export default class Metal implements Material {
     albedo: Vec3
-    fuzz: number
+    fuzz :number
 
-    constructor(albedo: Vec3 | number, fuzz = 1) {
+    constructor(albedo: Vec3 | number,fuzz :number = 1) {
         this.albedo = new Vec3(0, 0, 0).add(albedo)
         this.fuzz = fuzz
     }

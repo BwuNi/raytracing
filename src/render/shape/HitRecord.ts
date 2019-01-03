@@ -1,4 +1,4 @@
-import Vec3 from "../base/Vec3"
+import Vec3 from "../base/Vec3";
 
 export default class HitRecord {
     t: number

@@ -1,4 +1,4 @@
-import Material from './Material.interface'
+import Material, { Attenuation } from './Material.interface'
 import Ray from '../base/Ray'
 import HitRecord from '../shape/HitRecord'
 import Vec3 from '../base/Vec3'

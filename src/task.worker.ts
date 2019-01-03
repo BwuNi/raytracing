@@ -16,16 +16,18 @@ onmessage = function (e) {
 	}
 }
 
+
 function render(task: RenderTask) {
 
-	const { pixels, width, height, position } = task
+	const { pixels, width, height } = task
 	const len = 40
 
 	let res = new RenderTask([], width, height)
 
+	
 	function doTask(i: number) {
 
-		for (let j = 0; j < len; j++) {
+		for (let j = 0; j < len && ((i + j) < pixels.length); j++) {
 			renderPixel(pixels[i + j], width, height)
 			res.pixels.push(pixels[i + j])
 		}
@@ -34,10 +36,11 @@ function render(task: RenderTask) {
 			method: 'partComplete',
 			args: [res]
 		})
+		
+		res = new RenderTask([], width, height)
 
 		if ((i + len) < pixels.length) {
 
-			res = new RenderTask([], width, height)
 
 			return setTimeout(() => {
 				doTask(i + len)
@@ -51,7 +54,7 @@ function render(task: RenderTask) {
 		}
 
 	}
+
 	
 	doTask(0)
 }
-
