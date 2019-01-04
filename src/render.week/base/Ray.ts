@@ -37,7 +37,6 @@ export default class Ray {
 
         if(res && (Math.random() > schlick(consine,ni_over_nt))) return new Ray(hit.p,res,this.time)
         else return this.reflect(hit)
-
     }
 }
 
