@@ -45,7 +45,7 @@ export default class MovingSphere implements Hitable {
     }
 
     center(t: number) {
-        return this.center0.add(
+        return t < this.time0 ?this.center0 :t >this.time1 ?this.time1:this.center0.add(
             this.center1.sub(this.center0).mul(
                 (t - this.time0) / (this.time1 - this.time0)
             )
