@@ -1,5 +1,6 @@
 import RenderTask from './task/RenderTask'
 import renderPixel from './render.week/index'
+import AABB from './render.week/shape/AABB';
 
 
 const appMsg: { [key: string]: Function } = {
@@ -27,6 +28,7 @@ function render(task: RenderTask) {
 	
 	function doTask(i: number) {
 
+
 		for (let j = 0; j < len && ((i + j) < pixels.length); j++) {
 			renderPixel(pixels[i + j], width, height)
 			res.pixels.push(pixels[i + j])
@@ -47,6 +49,9 @@ function render(task: RenderTask) {
 			}, 0);
 
 		} else {
+			
+			console.log(AABB.t +" " +AABB.f)
+
 			; (<any>postMessage)({
 				method: 'allComplete',
 				args: [res]
@@ -57,4 +62,6 @@ function render(task: RenderTask) {
 
 	
 	doTask(0)
+
+	
 }

@@ -3,6 +3,7 @@ import HitRecord from './HitRecord'
 import Vec3 from "../base/Vec3";
 import Hitable, { HitResult } from "./Hitable.interface"
 import Material from "../material/Material.interface";
+import AABB from "./AABB";
 
 
 export default class MovingSphere implements Hitable {
@@ -14,6 +15,22 @@ export default class MovingSphere implements Hitable {
     radius: number
     material: Material
 
+    _aabb: AABB
+
+    aabb(t_min: number, t_max: number) {
+        const center0 = this.center(t_min)
+        const center1 = this.center(t_max)
+
+        let a0: AABB = null;
+        let a1: AABB = null;
+
+        a0 = new AABB(center0.sub(this.radius), center0.add(this.radius))
+        a1 = new AABB(center1.sub(this.radius), center1.add(this.radius))
+
+
+        return a0.add(a1)
+    }
+
     constructor(center0: Vec3, center1: Vec3, r: number, material: Material, time0: number, time1: number) {
 
         this.time0 = time0
@@ -22,6 +39,8 @@ export default class MovingSphere implements Hitable {
         this.center1 = center1
         this.radius = r
         this.material = material
+
+        this._aabb = (new AABB(this.center0.add(r),this.center0.sub(r))).add(new AABB(this.center1.add(r),this.center1.sub(r)))
 
     }
 

@@ -11,6 +11,8 @@ canvas.width = width
 const ctx = canvas.getContext('2d')
 const image = ctx.createImageData(width, height)
 const bar = document.getElementById('processline')
+const begin = (new Date()).getTime()
+const now = ()=>((new Date()).getTime() - begin)/1000
 
 
 initTasks(ctx, width, height, 4)
@@ -116,7 +118,7 @@ const taskMsg: { [key: string]: Function } = {
             bar.style.width = ((complete / amount) > 1 ? 1 : (complete / amount)) * 100 + '%'
 
 
-            console.log(complete)
+            console.log(now())
 
             ctx.putImageData(image, 0, 0)
         }
@@ -124,3 +126,4 @@ const taskMsg: { [key: string]: Function } = {
         worker.terminate()
     }
 }
+

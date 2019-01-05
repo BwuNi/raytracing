@@ -55,7 +55,7 @@ const earth = new Sphere(
     new Metal(0.5,0.2)
 )
 
-const n = 60
+const n = 1
 
 const camera = new Camera(
     new Vec3(9, 1.1, 2),
@@ -159,3 +159,4 @@ function createSence(): Hitable {
     return new HitList(...list)
 
 }
+
