@@ -4,7 +4,7 @@ import Vec3 from './base/Vec3'
 import sence from './sence'
 
 
-const n = 200
+const n = 50
 const [camera,world] = sence()
 
 export default function renderPixel(v: Px, width: number, height: number) {

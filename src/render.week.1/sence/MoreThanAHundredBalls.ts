@@ -9,7 +9,7 @@ import Dielectric from "../material/Dielectric";
 import HitList from "../shape/HitList";
 import { Checker, Color } from "../texture";
 
-const random = function (seed: number) { return parseFloat('0.' + Math.sin(seed).toString().substr(6)); }
+import random from '../base/random'
 
 const camera = new Camera(
     new Vec3(9, 1.1, 2),
