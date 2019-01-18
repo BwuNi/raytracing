@@ -45,7 +45,7 @@ class Nosie implements Texture {
     value(u: number, v: number, p: Vec3): Vec3 {
 
         return new Vec3(1, 1, 1).mul(0.5).mul(
-            1 + Math.sin(this.scale * p.e2 + 10 * this.perlin.turb(p)))
+            1 + Math.sin(this.scale * p.e0 + 10 * this.perlin.turb(p)))
 
         return (new Vec3(1, 1, 1)).mul(this.perlin.turb(p.mul(this.scale)))
         

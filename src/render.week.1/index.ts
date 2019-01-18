@@ -4,7 +4,7 @@ import Vec3 from './base/Vec3'
 import sence from './sence'
 
 
-const n = 50
+const n = 200
 const [camera,world] = sence()
 
 export default function renderPixel(v: Px, width: number, height: number) {
@@ -33,10 +33,13 @@ function trace(r: Ray, step = 0): Vec3 {
 
     const res = world.hit(r, 0.001, Infinity)
 
-    if (res) {
+    if (res && res[1]) {
         return trace(res[1], ++step).mul(res[2])
+    }else if(res){
+        return res[2]?res[2]:new Vec3(0,0,0)
     } else {
         // 设置背景色
+        return new Vec3(0,0,0)
         const
             unitDirection = r.direction.unitVec(),
             t = (unitDirection.e1 + 1.0) * 0.5

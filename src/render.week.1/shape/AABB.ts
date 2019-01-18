@@ -7,9 +7,17 @@ export default class AABB {
     min: Vec3
     max: Vec3
 
-    static default = () => {
+    static default = () :AABB=> {
         const def = new AABB(new Vec3(0), new Vec3(0))
         def.min = new Vec3(Infinity, Infinity, Infinity)
+        def.max = new Vec3(-Infinity, -Infinity, -Infinity)
+        return def
+    }
+
+    
+    static infinity = ():AABB => {
+        const def = new AABB(new Vec3(0), new Vec3(0))
+        def.max = new Vec3(Infinity, Infinity, Infinity)
         def.min = new Vec3(-Infinity, -Infinity, -Infinity)
         return def
     }

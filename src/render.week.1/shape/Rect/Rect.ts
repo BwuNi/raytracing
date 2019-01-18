@@ -1,10 +1,11 @@
-import Vec3, { axis } from "../base/Vec3";
-import Ray from "../base/Ray";
-import { HitResult } from "./Hitable.interface";
-import Material from "../material/Material.interface";
-import Hitable from "./Hitable.interface";
-import HitRecord from "./HitRecord";
-import AABB from "./AABB";
+import Vec3, { axis } from "../../base/Vec3";
+import Ray from "../../base/Ray";
+import { HitResult } from "../Hitable.interface";
+import Material from "../../material/Material.interface";
+import Hitable from "../Hitable.interface";
+import HitRecord from "../HitRecord";
+import AABB from "../AABB";
+import Plane from "./Plane";
 
 const compare = {
     minmax(a: number, b: number, c?: number): [number, number] {
@@ -29,11 +30,11 @@ const compare = {
 }
 
 export {
-    compare
+    compare,Plane
 }
 
 
-export default class AAB implements Hitable {
+export default class Rect implements Hitable {
     min: Vec3
     max: Vec3
     material: Material
@@ -111,4 +112,3 @@ export default class AAB implements Hitable {
         return [hit, e, f]
     }
 }
-

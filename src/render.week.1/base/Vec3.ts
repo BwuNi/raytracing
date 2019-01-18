@@ -96,9 +96,24 @@ export default class Vec3 {
         return this.div(this.length())
     }
 
+    transform(m: Matrix) {
+        return new Vec3(
+            this.e0 * m[0]+ this.e1*m[3]+ this.e1*m[6],
+            this.e0 * m[1]+ this.e1*m[4]+ this.e1*m[7],
+            this.e0 * m[2]+ this.e1*m[5]+ this.e1*m[8]
+        )
+    }
+
 }
 
 const axis: ['e0', 'e1', 'e2'] = ['e0', 'e1', 'e2']
 
-export { axis }
+
+type Matrix = [
+    number, number, number,
+    number, number, number,
+    number, number, number
+]
+
+export { axis ,Matrix}
 
