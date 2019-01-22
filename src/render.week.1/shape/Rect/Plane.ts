@@ -7,7 +7,7 @@ import HitRecord from "../HitRecord";
 
 type Axis = 'e0' | 'e1' | 'e2'
 
-export default class Plane implements Hitable {
+export default class Plane extends Hitable {
 
     material: Material
 
@@ -35,6 +35,7 @@ export default class Plane implements Hitable {
         matrial: Material,
     ) {
 
+        super()
         this.material = matrial
 
         const a0 = new Vec3(0)

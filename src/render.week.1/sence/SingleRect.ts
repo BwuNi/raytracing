@@ -11,7 +11,6 @@ import { Nosie, Color } from "../texture";
 import AAB from "../shape/AAB";
 import Rect, { Plane } from "../shape/Rect/Rect";
 import DiffuseLight from "../material/DiffuseLight";
-import Transform from "../shape/transform";
 
 
 export default function (): [Camera, Hitable] {
@@ -19,7 +18,7 @@ export default function (): [Camera, Hitable] {
     const ball = new Sphere(
         new Vec3(0, 2, 0),
         2,
-        new Lambertian(new Nosie(5))
+        new Lambertian(new Nosie(10))
     )
 
 
@@ -73,20 +72,25 @@ export default function (): [Camera, Hitable] {
     )
 
     const rect = new Rect(
-        new Vec3(-0.7, -1, 0.7),
-        new Vec3(0, 0.5, 0.20),
-        new Dielectric(0.8,1.5)
-    )
+        0.8,1.499,0.8,
+        new Dielectric(1,1.5)
+    ).translate(new Vec3(-0.5,-0.25,-0.5))
+    
+    // const rect = new Sphere(
+    //     new Vec3(-0.5,-0.25,-0.5),
+    //     0.5,
+    //     new Dielectric(0.8,1.5)
+    // ).translate(new Vec3(-0.5,-0.25,-0.5))
     
     const rect1 = new Rect(
-        new Vec3(0.5, -1, -0.7),
-        new Vec3(0, -0.3, -0.20),
-        new Lambertian(new Nosie(8))
-    )
+        0.5,0.7,0.5,
+        new Lambertian(new Nosie(800))
+    ).translate(new Vec3(0.5,-0.65,0.5))
+
     const world = new HitList(
         box,
         rect,
-        Transform.translate(rect1,new Vec3(0.1,0,0)),
+        rect1,
         light
         
     )

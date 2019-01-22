@@ -8,6 +8,7 @@ import Metal from "../material/Metal";
 import Dielectric from "../material/Dielectric";
 import HitList from "../shape/HitList";
 import AAB from "../shape/AAB";
+import Rect from "../shape/Rect";
 
 
 export default function (): [Camera, Hitable] {
@@ -19,14 +20,21 @@ export default function (): [Camera, Hitable] {
     const ballll = new Sphere(
         new Vec3(-1, 0, -1),
         0.5,
-        new Dielectric(new Vec3(1, 1, 1), 1.5)
-    )
-
-    const box = new AAB(
-        new Vec3(-0.5, -0.5, -1.5),
-        new Vec3(0.5, 0.5, -0.5),
         new Metal(new Vec3(0.8, 0.4, 0.9), 0.5)
     )
+
+    // const box = new AAB(
+    //     new Vec3(-0.25, -0.25, -1.25),
+    //     new Vec3(0.25, 0.25, -0.25),
+    //     new Metal(new Vec3(0.8, 0.4, 0.9), 0.5)
+    // )
+    
+    const box = new Rect(
+        1,1,1,
+        new Dielectric(new Vec3(1, 1, 1), 1)
+    )
+    .translate(new Vec3(0,0,-1))
+
     const earth = new Sphere(
         new Vec3(0, -100.5, -1),
         100,

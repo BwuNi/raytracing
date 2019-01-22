@@ -1,4 +1,5 @@
-import compare from './compare'
+
+import compare from '../../base/compare'
 import Rect from './Rect'
 import XYRect from './Plane'
 

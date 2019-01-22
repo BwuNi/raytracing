@@ -1,5 +1,6 @@
 import RenderTask from './task/RenderTask'
 import renderPixel from './render.week.1/index'
+import count from './render.week.1/base/count';
 
 
 const appMsg: { [key: string]: Function } = {
@@ -49,7 +50,7 @@ function render(task: RenderTask) {
 
 		} else {
 			
-			// console.log(AABB.t/AABB.f)
+			console.log(count)
 
 			; (<any>postMessage)({
 				method: 'allComplete',

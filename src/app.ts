@@ -1,5 +1,6 @@
 import Px from './task/Px'
 import RenderTask from './task/RenderTask'
+import { compare } from './render.week.1/shape/Rect';
 
 const height = 400
 const width = 800
@@ -126,4 +127,3 @@ const taskMsg: { [key: string]: Function } = {
         worker.terminate()
     }
 }
-

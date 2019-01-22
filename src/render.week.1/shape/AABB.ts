@@ -1,4 +1,5 @@
-import { compare } from "./AAB";
+
+import compare from '../base/compare'
 import Vec3, { axis } from "../base/Vec3";
 import Ray from "../base/Ray";
 

@@ -6,7 +6,7 @@ import AABB from "./AABB";
 import BVHNode from "./BVHNode";
 
 
-export default class HitList {
+export default class HitList extends Hitable {
 
     list: Hitable[]
     aabb: AABB
@@ -14,6 +14,7 @@ export default class HitList {
 
 
     constructor(...arg: Hitable[]) {
+        super()
         this.list = []
         arg.forEach(
             v => {

@@ -6,7 +6,7 @@ import Material from "../material/Material.interface";
 import AABB from "./AABB";
 
 
-export default class Sphere implements Hitable {
+export default class Sphere extends Hitable {
 
     center: Vec3
     radius: number
@@ -14,7 +14,7 @@ export default class Sphere implements Hitable {
     aabb: AABB
 
     constructor(center: Vec3, r: number, material: Material) {
-
+        super()
         this.center = center
         this.radius = r
         this.material = material

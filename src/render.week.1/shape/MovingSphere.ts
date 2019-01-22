@@ -5,7 +5,7 @@ import Hitable, { HitResult } from "./Hitable.interface"
 import Material from "../material/Material.interface";
 import AABB from "./AABB";
 
-export default class MovingSphere implements Hitable {
+export default class MovingSphere extends Hitable {
 
     center0: Vec3
     center1: Vec3
@@ -16,6 +16,7 @@ export default class MovingSphere implements Hitable {
     aabb:AABB
 
     constructor(center0: Vec3, center1: Vec3, r: number, material: Material, time0: number, time1: number) {
+        super()
 
         this.time0 = time0
         this.time1 = time1

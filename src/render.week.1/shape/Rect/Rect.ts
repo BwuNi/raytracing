@@ -6,41 +6,28 @@ import Hitable from "../Hitable.interface";
 import HitRecord from "../HitRecord";
 import AABB from "../AABB";
 import Plane from "./Plane";
+import HitList from "../HitList";
+import compare from "../../base/compare";
+import count from "../../base/count";
 
-const compare = {
-    minmax(a: number, b: number, c?: number): [number, number] {
-        const res: [number, number] = a < b ? [a, b] : [b, a]
-        if (!c && c !== 0) return res
-        if (c < res[0]) return (res[0] = c, res)
-        if (c > res[1]) return (res[1] = c, res)
-        return res
-    },
-    min(a: number, b: number, c?: number): number {
-        const res: number = a < b ? a : b
-        if (!c && c !== 0) return res
-        if (c < res) return c
-        return res
-    },
-    max(a: number, b: number, c?: number): number {
-        const res: number = a > b ? a : b
-        if (!c && c !== 0) return res
-        if (c > res) return c
-        return res
-    }
-}
 
 export {
-    compare,Plane
+    Plane
 }
 
 
-export default class Rect implements Hitable {
+
+export default class Rect extends Hitable {
     min: Vec3
     max: Vec3
     material: Material
-    aabb:AABB
+    aabb: AABB
 
-    constructor(a0: Vec3, a1: Vec3, material: Material) {
+    constructor(e0: number, e1: number, e2: number, material: Material) {
+        super()
+        const a0 = new Vec3(-e0 / 2, -e1 / 2, -e2 / 2)
+        const a1 = new Vec3(e0 / 2, e1 / 2, e2 / 2)
+
         const x = compare.minmax(a0.e0, a1.e0)
         const y = compare.minmax(a0.e1, a1.e1)
         const z = compare.minmax(a0.e2, a1.e2)
@@ -48,7 +35,7 @@ export default class Rect implements Hitable {
         this.min = new Vec3(x[0], y[0], z[0])
         this.max = new Vec3(x[1], y[1], z[1])
         this.material = material
-        this.aabb = new AABB(this.min,this.max)
+        this.aabb = new AABB(this.min, this.max)
     }
 
     hit(
@@ -57,7 +44,19 @@ export default class Rect implements Hitable {
         t_max: number
     ): HitResult {
         // if(!this.aabb.isCrossed(ray,t_min,t_max)) return null
-        const a = <[[number, number], [number, number], [number, number]]>
+
+        type axisHit = {
+            axis: 'e0' | 'e1' | 'e2',
+            side: 'min' | 'max',
+            t: number
+        }
+
+        const creacteAxisHit = (
+            axis: 'e0' | 'e1' | 'e2',
+            side: 'min' | 'max',
+            t: number): axisHit => ({ axis, side, t })
+
+        const a = <[[axisHit, axisHit], [axisHit, axisHit], [axisHit, axisHit]]>
             axis.map((v, i) => {
                 const m = ray.direction[v]
                 const n = ray.origin[v]
@@ -66,48 +65,53 @@ export default class Rect implements Hitable {
 
                 if (m === 0) {
                     //平行于轴线地情况
-                    if ((n >= min) && (n <= max)) return <[number, number]>[-Infinity, Infinity]
-                    else return <[number, number]>[Infinity, -Infinity]
+                    if ((n >= min) && (n <= max))
+                        return <[axisHit, axisHit]>[
+                            creacteAxisHit(v, 'min', -Infinity), creacteAxisHit(v, 'max', Infinity)
+                        ]
+                    else return <[axisHit, axisHit]>[
+                        creacteAxisHit(v, 'min', Infinity),
+                        creacteAxisHit(v, 'max', -Infinity)
+                    ]
                 } else {
-                    const a = (min - n) / m
-                    const b = (max - n) / m
-                    return <[number, number]>(a < b ? [a, b] : [b, a])
+                    const a = creacteAxisHit(v, 'min', (min - n) / m)
+                    const b = creacteAxisHit(v, 'max', (max - n) / m)
+                    return a.t < b.t ? [a, b] : [b, a]
                 }
             })
 
-        const min = compare.max(a[0][0], a[1][0], a[2][0])
-        const max = compare.min(a[0][1], a[1][1], a[2][1])
 
-        const res = min > max ? null :
-            (t_min <= min && min <= t_max) ? min :
-                (t_min <= max && min <= t_max) ? max : null
+        const min = compare.maxT(
+            [a[0][0], a[1][0], a[2][0]],
+            a => a.t
+        )
+        const max = compare.minT(
+            [a[0][1], a[1][1], a[2][1]],
+            a => a.t
+        )
+
+
+        const res = min.t > max.t ? null :
+            (t_min <= min.t && min.t <= t_max) ? min :
+                (t_min <= max.t && max.t <= t_max) ? max : null
 
         if (res === null) return null
 
-        const m: [number, number] = [
-            1, // 0 -> min 1-> max
-            1  //[0,1,2] -> ['e0', 'e1', 'e2']
-        ]
-
-        a.forEach((v, i) => v.forEach((w, j) => {
-            if (w == res) {
-                m[0] = j
-                m[1] = i
-            }
-        }))
 
         const n = new Vec3(0, 0, 0)
-        const p = ray.getPoint(res)
+        const p = ray.getPoint(res.t)
 
-        if (p.e0 < -2) {
-            console.log(1)
-        }
+        n[res.axis] = (res.side == 'min') ? -1 : 1
 
-        n[axis[m[1]]] = (m[0] == 0) ? 1 : -1
-
-        const hit = new HitRecord(res, ray.getPoint(res), n)
+        const hit = new HitRecord(res.t, p, n)
 
         const [e, f] = this.material.scatter(ray, hit)
+
+
+        const aa = e.direction.unitVec()
+        const bb = ray.direction.unitVec()
+
+        const cc = aa.sub(bb).squaredLength()
 
         return [hit, e, f]
     }

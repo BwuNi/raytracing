@@ -5,12 +5,13 @@ import HitList from "./HitList";
 import { axis } from "../base/Vec3";
 
 
-export default class BVHNode implements Hitable {
+export default class BVHNode extends Hitable {
     left: Hitable
     right: Hitable
     aabb: AABB
 
     constructor(left: Hitable, right: Hitable) {
+        super()
         this.left = left
         this.right = right
         this.aabb = AABB.add(left.aabb, right.aabb)

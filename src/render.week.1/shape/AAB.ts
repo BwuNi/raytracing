@@ -1,45 +1,22 @@
 import Vec3, { axis } from "../base/Vec3";
 import Ray from "../base/Ray";
-import { HitResult } from "./Hitable.interface";
+import Hitable,{ HitResult } from "./Hitable.interface";
 import Material from "../material/Material.interface";
-import Hitable from "./Hitable.interface";
 import HitRecord from "./HitRecord";
 import AABB from "./AABB";
-
-const compare = {
-    minmax(a: number, b: number, c?: number): [number, number] {
-        const res: [number, number] = a < b ? [a, b] : [b, a]
-        if (!c && c !== 0) return res
-        if (c < res[0]) return (res[0] = c, res)
-        if (c > res[1]) return (res[1] = c, res)
-        return res
-    },
-    min(a: number, b: number, c?: number): number {
-        const res: number = a < b ? a : b
-        if (!c && c !== 0) return res
-        if (c < res) return c
-        return res
-    },
-    max(a: number, b: number, c?: number): number {
-        const res: number = a > b ? a : b
-        if (!c && c !== 0) return res
-        if (c > res) return c
-        return res
-    }
-}
-
-export {
-    compare
-}
+import compare from '../base/compare'
 
 
-export default class AAB implements Hitable {
+export default class AAB extends Hitable {
     min: Vec3
     max: Vec3
+    
     material: Material
     aabb:AABB
 
     constructor(a0: Vec3, a1: Vec3, material: Material) {
+        super()
+
         const x = compare.minmax(a0.e0, a1.e0)
         const y = compare.minmax(a0.e1, a1.e1)
         const z = compare.minmax(a0.e2, a1.e2)
