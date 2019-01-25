@@ -1,11 +1,12 @@
 import Px from '../task/Px'
 import Ray from './base/Ray'
 import Vec3 from './base/Vec3'
-import sence from './sence'
+
+import {background,world,camera} from './sence'
 
 
-const n = 30
-const [camera,world] = sence()
+
+const n = 50
 
 export default function renderPixel(v: Px, width: number, height: number) {
     ;[v.r, v.g, v.b, v.a] = new Array(n)
@@ -33,18 +34,11 @@ function trace(r: Ray, step = 0): Vec3 {
 
     const res = world.hit(r, 0.001, Infinity)
 
-    if (res && res[1]) {
+    if (res) {
         return trace(res[1], ++step).mul(res[2])
-    }else if(res){
-        return res[2]?res[2]:new Vec3(0,0,0)
     } else {
         // 设置背景色
-        return new Vec3(0,0,0)
-        const
-            unitDirection = r.direction.unitVec(),
-            t = (unitDirection.e1 + 1.0) * 0.5
-        return Vec3.add(new Vec3(1, 1, 1).mul(1 - t), new Vec3(0.3, 0.5, 1).mul(t))
+        return background(r)
     }
 }
-
 

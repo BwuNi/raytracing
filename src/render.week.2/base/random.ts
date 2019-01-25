@@ -1,0 +1,1 @@
+export default function (seed: number) { return parseFloat('0.' + Math.sin(seed).toString().substr(6)); }

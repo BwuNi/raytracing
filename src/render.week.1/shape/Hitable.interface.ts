@@ -2,7 +2,7 @@ import Ray from "../base/Ray";
 import HitRecord from "./HitRecord";
 // import Material, { Attenuation } from "../material/Material.interface";
 import AABB from "./AABB";
-import Vec3 from "../base/Vec3";
+import Vec3, { axis } from "../base/Vec3";
 
 export default class Hitable {
 
@@ -45,19 +45,32 @@ export default class Hitable {
     }
 
 
-    rotate(axis: 'e0' | 'e1' | 'e2', angle: number, origin: Vec3) {
-
-        const radians = angle / 180 * Math.PI
-
-        const vec = origin
-        const backVec = new Vec3(0).sub(origin)
+    rotate(axis: 'e0' | 'e1' | 'e2', angle: number) {
 
 
-        const v = this.translate(backVec)
-
+        const a = ['e0', 'e1', 'e2'].filter(v => v !== axis)
     }
 
 }
+
+function rotate(x: number, y: number, angle: number): [number, number] {
+    const radians = angle / 180 * Math.PI
+    return [
+        Math.cos(radians) * x - Math.sin(radians) * y,
+        Math.cos(radians) * y - Math.sin(radians) * x
+    ]
+}
+function rotateVec3(
+    rAxis: 'e0' | 'e1' | 'e2', angle: number, vec: Vec3
+) {
+    const a = axis.filter(v => v !== rAxis)
+    const b = rotate(vec[a[0]], vec[a[1]], angle)
+    const res = new Vec3(0, 0, 0)
+    res[rAxis] = vec[rAxis]
+    res[a[0]] = b[0]
+    res[a[1]] = b[1]
+}
+
 
 
 type HitResult = [HitRecord, Ray, Vec3]

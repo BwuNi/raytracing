@@ -1,5 +1,5 @@
 import RenderTask from './task/RenderTask'
-import renderPixel from './render.week.1/index'
+import renderPixel from './render.week.2/index'
 import count from './render.week.1/base/count';
 
 
