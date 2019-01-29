@@ -196,16 +196,13 @@ export default class Vec3 {
         return this.div(this.length())
     }
 
+
 }
 
 const axis: ['e0', 'e1', 'e2'] = ['e0', 'e1', 'e2']
 
 
-type Matrix = [
-    number, number, number,
-    number, number, number,
-    number, number, number
-]
 
-export { axis ,Matrix}
+
+export { axis }
 

@@ -2,6 +2,7 @@ import AABB from "./AABB";
 import Hitable, { HitResult } from "./Hitable.interface";
 import Ray from "../base/Ray";
 import Vec3, { axis } from "../base/Vec3";
+import Matrix3_3 from "../base/Matrix3_3";
 
 export default class Transfromable implements Hitable {
     aabb: AABB = AABB.default()
@@ -118,8 +119,6 @@ export default class Transfromable implements Hitable {
 
     }
 
-
-
     scale(e0: number, e1: number, e2: number) {
 
         if (e0 === 0 || e1 === 0 || e2 === 0)
@@ -161,6 +160,17 @@ export default class Transfromable implements Hitable {
         return new Transfromable(aabb, hit)
 
 
+    }
+
+    matrix(m: [number, number, number,
+        number, number, number,
+        number, number, number]) {
+
+            const matrix = new Matrix3_3(m)
+
+            const inverse = matrix.inverse()
+
+            if(!inverse) throw "Transformable: matrix can't be inversed"
     }
 }
 
