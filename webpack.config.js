@@ -12,7 +12,7 @@ module.exports = {
         chunkFilename: 'chunk/[id]_[chunkhash:8].chunk.js'
     },
 	devServer:{
-        port: 8888,
+        port: 8889,
     },
     devtool:"source-map",
     module:{

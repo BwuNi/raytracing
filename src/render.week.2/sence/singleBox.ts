@@ -16,10 +16,15 @@ const ball = new Sphere(
     1,
     new Metal(new Vec3(0.8, 0.4, 0.9), 0.5)
 )
-.scale(1,0.5,1.5)
-.rorate('e2',30)
-.rorate('e1',-20)
-.translate(new Vec3(0,0.2,0))
+.matrix([
+    1,0.5,0,
+    0.5,0.8,0,
+    0,0,1
+])
+// .scale(1,0.5,1.5)
+// .rorate('e2',30)
+// .rorate('e1',-20)
+// .translate(new Vec3(0,0.2,0))
 
 
 const earth = new Sphere(

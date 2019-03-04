@@ -65,25 +65,6 @@ export default class Matrix3_3 {
             v1_3, v2_3, v3_3,
         ])
     }
-
-    matrix3_3(v: Matrix3_3) {
-        const [
-            v1_1, v1_2, v1_3,
-            v2_1, v2_2, v2_3,
-            v3_1, v3_2, v3_3,
-        ] = v.value
-
-        const [
-            w1_1, w1_2, w1_3,
-            w2_1, w2_2, w2_3,
-            w3_1, w3_2, w3_3,
-        ] = this.value
-
-
-
-
-    }
-
 }
 
 function det2_2([a, b, c, d]: [number, number, number, number]) {
@@ -129,33 +110,7 @@ function M([
         number, number, number
     ]>c
 }
-console.log(
-    new Matrix3_3([
-        1, 2, 3,
-        0, 1, 4,
-        5, 6, 0
-    ]).inverse()
-)
 
-const o = new Matrix3_3([
-    1, 2, 3,
-    0, 1, 4,
-    5, 6, 0
-])
-
-const i = o.inverse()
-
-const vec = new Vec3(1, 6, 3)
-
-const arc = new Vec3(3, -1, 1)
-
-console.log(
-    Vec3.dot(
-        o.vec3(vec),
-        i.transposed().vec3(arc)
-    )
-)
-//22 18 41
 
 // 如何求3X3矩阵的逆矩
 //https://zh.wikihow.com/%E6%B1%823X3%E7%9F%A9%E9%98%B5%E7%9A%84%E9%80%86%E7%9F%A9%E9%98%B5

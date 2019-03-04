@@ -171,6 +171,37 @@ export default class Transfromable implements Hitable {
             const inverse = matrix.inverse()
 
             if(!inverse) throw "Transformable: matrix can't be inversed"
+
+            const aabb = new AABB(
+                matrix.vec3(this.aabb.min),
+                matrix.vec3(this.aabb.max),
+            )
+
+            const hit = (
+                ray: Ray,
+                t_min: number,
+                t_max: number) => {
+                const nRay = new Ray(
+                    inverse.vec3(ray.origin),
+                    inverse.vec3(ray.direction),
+                    ray.time)
+    
+                const res = this.hit(nRay, t_min, t_max)
+    
+                if (res && res[0]) {
+                    res[0].p = matrix.vec3(res[0].p)
+                    res[0].normal = inverse.transposed().vec3(res[0].normal)
+                }
+    
+    
+                if (res && res[1]) {
+                    res[1].origin = matrix.vec3(res[1].origin)
+                    res[1].direction = matrix.vec3(res[1].direction)
+                }
+    
+                return res
+            }
+            return new Transfromable(aabb, hit)
     }
 }
 
